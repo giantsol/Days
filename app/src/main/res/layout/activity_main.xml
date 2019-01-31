@@ -20,9 +20,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?actionBarSize"
-        app:tabTextColor="@color/heading1"
+        app:tabTextColor="@color/text_heading1"
         app:tabGravity="fill"
-        app:tabIndicatorColor="@color/heading1"
+        app:tabIndicatorColor="@color/text_heading1"
         app:tabIndicatorHeight="4dp"
         app:tabBackground="@color/colorPrimary"
         app:tabMode="fixed"/>

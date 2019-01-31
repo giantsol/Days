@@ -9,7 +9,7 @@
     </style>
 
     <style name="Toolbar" parent="@style/ThemeOverlay.AppCompat.Dark">
-        <item name="colorControlNormal">@color/heading1</item>
-        <item name="titleTextColor">@color/heading1</item>
+        <item name="colorControlNormal">@color/text_heading1</item>
+        <item name="titleTextColor">@color/text_heading1</item>
     </style>
 </resources>

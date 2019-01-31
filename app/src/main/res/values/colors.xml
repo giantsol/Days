@@ -4,5 +4,10 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="heading1">#FFFFFF</color>
+    <color name="text_heading1">#FFFFFF</color>
+
+    <color name="button_unselected">#FFFFFF</color>
+    <color name="button_selected">#888888</color>
+
+    <color name="page_background">#FFFFFF</color>
 </resources>
