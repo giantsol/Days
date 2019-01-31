@@ -29,7 +29,7 @@ class RecordFragment: Fragment() {
 
         val floatingButton: FloatingActionButton = view.findViewById(R.id.floating_button)
         floatingButton.setOnClickListener { _ ->
-            Toast.makeText(context, "hello", Toast.LENGTH_SHORT).show()
+            showCreateRecordDialog()
         }
 
         val arrowBack: View = view.findViewById(R.id.arrow_back)
@@ -50,5 +50,11 @@ class RecordFragment: Fragment() {
         viewModel.getCurrentDateLiveData().observe(this, Observer<Date> { currentDate ->
             dateText.text = currentDate.toDisplayFormat()
         })
+    }
+
+    private fun showCreateRecordDialog() {
+        val transaction = fragmentManager.beginTransaction()
+        val dialog = CreateRecordDialog.newInstance()
+        dialog.show(transaction, null)
     }
 }
