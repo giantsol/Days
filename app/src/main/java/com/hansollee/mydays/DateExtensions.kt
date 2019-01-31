@@ -20,14 +20,7 @@ fun Date.toDisplayFormat(): String {
     }
 }
 
-fun Date.getDateBefore(days: Int): Date {
-    val cal = Calendar.getInstance()
-    cal.time = this
-    cal.add(Calendar.DATE, -days)
-    return cal.time
-}
-
-fun Date.getDateAfter(days: Int): Date {
+fun Date.getChangedDate(days: Int): Date {
     val cal = Calendar.getInstance()
     cal.time = this
     cal.add(Calendar.DATE, days)

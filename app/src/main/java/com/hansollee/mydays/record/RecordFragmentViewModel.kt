@@ -3,8 +3,7 @@ package com.hansollee.mydays.record
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.hansollee.mydays.getDateAfter
-import com.hansollee.mydays.getDateBefore
+import com.hansollee.mydays.getChangedDate
 import java.util.Date
 
 /**
@@ -25,14 +24,10 @@ class RecordFragmentViewModel: ViewModel() {
         return currentDateLiveData
     }
 
-    fun moveOneDayBefore() {
-        val oneDayBefore = getCurrentDateLiveData().value.getDateBefore(1)
+    // currentDate를 days만큼 앞/뒤로 이동시킨다
+    fun changeCurrentDate(days: Int) {
+        val oneDayBefore = getCurrentDateLiveData().value.getChangedDate(days)
         currentDateLiveData.value = oneDayBefore
-    }
-
-    fun moveOneDayAfter() {
-        val oneDayAfter = getCurrentDateLiveData().value.getDateAfter(1)
-        currentDateLiveData.value = oneDayAfter
     }
 
     fun resetCurrentDateToToday() {
