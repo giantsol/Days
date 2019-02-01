@@ -10,7 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.NumberPicker
 import com.hansollee.mydays.R
-import com.hansollee.mydays.models.Time
+import org.threeten.bp.LocalTime
 import java.util.Locale
 
 /**
@@ -79,8 +79,11 @@ class CustomTimePicker
     private val minutePicker: NumberPicker
     private val amPmPicker: NumberPicker
 
-    val time: Time
-        get() = Time(hourPicker.value, minutePicker.value, isAm())
+    private val hourIn24: Int
+        get() = if (isAm()) hourPicker.value else hourPicker.value + 12
+
+    val time: LocalTime
+        get() = LocalTime.of(hourIn24, minutePicker.value)
 
     init {
         orientation = LinearLayout.HORIZONTAL

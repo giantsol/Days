@@ -12,11 +12,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Record
-import com.hansollee.mydays.models.Time
 import com.hansollee.mydays.toDisplayFormat
 import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.CustomTimePicker
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 /**
  * Created by kevin-ee on 2019-02-01.
@@ -73,7 +72,7 @@ class RecordEditorDialog : DialogFragment() {
             }
         }
 
-        recordFragViewModel.getCurrentDateLiveData().observe(this, Observer<Date> { date ->
+        recordFragViewModel.getCurrentDateLiveData().observe(this, Observer<LocalDate> { date ->
             currentDate.text = date.toDisplayFormat()
         })
 
@@ -89,10 +88,9 @@ class RecordEditorDialog : DialogFragment() {
     }
 
     private fun getValidityCheckResult(): ValidityCheckResult {
-        val fromTime: Time = fromTimePicker.time
-        val toTime: Time = toTimePicker.time
-        val timeDifference = toTime.minus(fromTime)
-        if (timeDifference <= 0) {
+        val fromTime = fromTimePicker.time
+        val toTime = toTimePicker.time
+        if (fromTime > toTime) {
             return ValidityCheckResult(false, "to는 from보다 늦은 시간이어야 합니다")
         }
 

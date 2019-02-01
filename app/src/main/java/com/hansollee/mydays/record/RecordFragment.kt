@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hansollee.mydays.R
 import com.hansollee.mydays.toDisplayFormat
-import java.util.Date
+import org.threeten.bp.LocalDate
 
 /**
  * Created by kevin-ee on 2019-01-31.
@@ -46,7 +46,7 @@ class RecordFragment: Fragment() {
             viewModel.resetCurrentDateToToday()
         }
 
-        viewModel.getCurrentDateLiveData().observe(this, Observer<Date> { currentDate ->
+        viewModel.getCurrentDateLiveData().observe(this, Observer<LocalDate> { currentDate ->
             dateText.text = currentDate.toDisplayFormat()
         })
     }
