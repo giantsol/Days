@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.hansollee.mydays.db.AppDatabase
 import com.hansollee.mydays.db.RecordDao
 import com.hansollee.mydays.models.Record
-import com.hansollee.mydays.toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -45,8 +44,16 @@ class RecordFragmentViewModel: ViewModel() {
         currentDateLiveData.value = LocalDate.now()
     }
 
-    fun commitRecord(isNew: Boolean, record: Record) {
+    fun insertNewRecord(record: Record) {
         recordDao.insertRecord(record).subscribeOn(Schedulers.io()).subscribe()
+    }
+
+    fun updateRecord(record: Record) {
+        recordDao.updateRecord(record).subscribeOn(Schedulers.io()).subscribe()
+    }
+
+    fun deleteRecord(record: Record) {
+        recordDao.deleteRecord(record).subscribeOn(Schedulers.io()).subscribe()
     }
 
     fun getRecordsLiveData(): LiveData<List<Record>> {

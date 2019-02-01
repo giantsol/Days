@@ -14,8 +14,14 @@ import com.hansollee.mydays.toStringFormat
  * Created by kevin-ee on 2019-02-01.
  */
 
-class RecordListAdapter(private val context: Context, private val recordFragViewModel: RecordFragmentViewModel)
+class RecordListAdapter(context: Context,
+                        private val recordFragViewModel: RecordFragmentViewModel,
+                        private val itemClickListener: RecordItemClickListener)
     : RecyclerView.Adapter<RecordListAdapter.RecordItemViewHolder>() {
+
+    interface RecordItemClickListener {
+        fun onItemClick(record: Record)
+    }
 
     private val inflater = LayoutInflater.from(context)
     private val records: ArrayList<Record> = ArrayList()
@@ -27,7 +33,7 @@ class RecordListAdapter(private val context: Context, private val recordFragView
     override fun getItemCount(): Int = records.size
 
     override fun onBindViewHolder(holder: RecordItemViewHolder, position: Int) {
-        holder.bind(records[position])
+        holder.bind(records[position], itemClickListener)
     }
 
     fun setRecords(newRecords: List<Record>) {
@@ -36,7 +42,7 @@ class RecordListAdapter(private val context: Context, private val recordFragView
         notifyDataSetChanged()
     }
 
-    class RecordItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class RecordItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
         companion object {
             fun create(inflater: LayoutInflater, parent: ViewGroup?)
@@ -47,10 +53,14 @@ class RecordListAdapter(private val context: Context, private val recordFragView
         private val toTime: TextView = view.findViewById(R.id.to_time)
         private val taskDescription: TextView = view.findViewById(R.id.task_description)
 
-        fun bind(record: Record) {
+        fun bind(record: Record, itemClickListener: RecordItemClickListener) {
             fromTime.text = record.fromTime.toStringFormat()
             toTime.text = record.toTime.toStringFormat()
             taskDescription.text = record.task
+
+            view.setOnClickListener { _ ->
+                itemClickListener.onItemClick(record)
+            }
         }
 
     }

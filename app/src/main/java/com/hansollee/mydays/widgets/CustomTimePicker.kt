@@ -153,4 +153,10 @@ class CustomTimePicker
             inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
         }
     }
+
+    fun showTime(time: LocalTime) {
+        hourPicker.value = time.hour % 12
+        minutePicker.value = time.minute
+        amPmPicker.value = if (time.hour < 12) AM else PM
+    }
 }

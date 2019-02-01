@@ -24,8 +24,8 @@ interface RecordDao {
     fun insertRecord(record: Record): Completable
 
     @Update
-    fun updateRecord(record: Record)
+    fun updateRecord(record: Record): Completable
 
     @Delete
-    fun deleteRecord(record: Record)
+    fun deleteRecord(record: Record): Completable
 }

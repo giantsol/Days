@@ -31,9 +31,9 @@ class RecordEditorDialog : DialogFragment() {
         fun newInstance(record: Record? = null): RecordEditorDialog {
             val instance = RecordEditorDialog()
 
-//            val args = Bundle()
-//            args.putParcelable(KEY_RECORD, record)
-//            instance.arguments = args
+            val args = Bundle()
+            args.putParcelable(KEY_RECORD, record)
+            instance.arguments = args
 
             return instance
         }
@@ -44,8 +44,13 @@ class RecordEditorDialog : DialogFragment() {
     private lateinit var toTimePicker: CustomTimePicker
     private lateinit var taskText: EditText
 
+    private var originalRecord: Record? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
+
+        originalRecord = arguments.getParcelable(KEY_RECORD)
+
         recordFragViewModel = ViewModelProviders.of(activity).get(RecordFragmentViewModel::class.java)
         val view = inflater.inflate(R.layout.dialog_create_record, container, false)
 
@@ -60,12 +65,27 @@ class RecordEditorDialog : DialogFragment() {
             dismiss()
         }
 
+        val deleteButton: Button = view.findViewById(R.id.delete_button)
+        if (originalRecord != null) {
+            deleteButton.visibility = View.VISIBLE
+            deleteButton.setOnClickListener { _ ->
+                recordFragViewModel.deleteRecord(originalRecord!!)
+                dismiss()
+            }
+        } else {
+            deleteButton.visibility = View.GONE
+        }
+
         val okButton: Button = view.findViewById(R.id.ok_button)
         okButton.setOnClickListener { _ ->
             // 우선 input들이 모두 valid한지 체크
             val validityCheckResult = getValidityCheckResult()
             if (validityCheckResult.isOk) {
-                recordFragViewModel.commitRecord(false, createRecordFromInputs())
+                if (originalRecord == null) {
+                    recordFragViewModel.insertNewRecord(createNewRecordFromInputs())
+                } else {
+                    recordFragViewModel.updateRecord(getUpdatedRecordWithInputs(originalRecord!!))
+                }
                 dismiss()
             } else {
                 toast(validityCheckResult.errorMessage)
@@ -76,15 +96,11 @@ class RecordEditorDialog : DialogFragment() {
             currentDate.text = date.toStringFormat()
         })
 
-        return view
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog.also {
-            it.window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            it.setCanceledOnTouchOutside(false)
+        if (originalRecord != null) {
+            fillViewsWithRecord(originalRecord!!)
         }
+
+        return view
     }
 
     private fun getValidityCheckResult(): ValidityCheckResult {
@@ -101,7 +117,28 @@ class RecordEditorDialog : DialogFragment() {
         return ValidityCheckResult(true, null)
     }
 
-    private fun createRecordFromInputs(): Record
+    private fun createNewRecordFromInputs(): Record
         = Record(recordFragViewModel.getCurrentDateLiveData().value,
         fromTimePicker.time, toTimePicker.time, taskText.text.toString())
+
+    private fun getUpdatedRecordWithInputs(originalRecord: Record): Record
+        = createNewRecordFromInputs().also { it.id = originalRecord.id }
+
+    private fun fillViewsWithRecord(record: Record) {
+        val fromTime = record.fromTime
+        val toTime = record.toTime
+
+        fromTimePicker.showTime(fromTime)
+        toTimePicker.showTime(toTime)
+
+        taskText.setText(record.task)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog.also {
+            it.window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            it.setCanceledOnTouchOutside(false)
+        }
+    }
 }

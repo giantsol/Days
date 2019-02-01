@@ -21,7 +21,7 @@ import org.threeten.bp.LocalDate
  * Created by kevin-ee on 2019-01-31.
  */
 
-class RecordFragment: Fragment() {
+class RecordFragment: Fragment(), RecordListAdapter.RecordItemClickListener {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater!!.inflate(R.layout.fragment_record, container, false)
@@ -52,7 +52,7 @@ class RecordFragment: Fragment() {
 
         val recordList: RecyclerView = view.findViewById(R.id.record_list)
         recordList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        val recordListAdapter = RecordListAdapter(context, viewModel)
+        val recordListAdapter = RecordListAdapter(context, viewModel, this)
         recordList.adapter = recordListAdapter
 
         viewModel.getCurrentDateLiveData().observe(this, Observer<LocalDate> { currentDate ->
@@ -65,9 +65,13 @@ class RecordFragment: Fragment() {
         })
     }
 
-    private fun showRecordEditorDialog() {
+    private fun showRecordEditorDialog(record: Record? = null) {
         val transaction = fragmentManager.beginTransaction()
-        val dialog = RecordEditorDialog.newInstance()
+        val dialog = RecordEditorDialog.newInstance(record)
         dialog.show(transaction, null)
+    }
+
+    override fun onItemClick(record: Record) {
+        showRecordEditorDialog(record)
     }
 }
