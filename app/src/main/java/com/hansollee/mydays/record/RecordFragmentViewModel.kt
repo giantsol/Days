@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.hansollee.mydays.getChangedDate
+import com.hansollee.mydays.models.Record
+import com.hansollee.mydays.toast
 import java.util.Date
 
 /**
@@ -34,8 +36,8 @@ class RecordFragmentViewModel: ViewModel() {
         currentDateLiveData.value = Date()
     }
 
-    override fun onCleared() {
-        super.onCleared()
+    fun commitRecord(isNew: Boolean, record: Record) {
+        toast(record.toString())
     }
 
 }

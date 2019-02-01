@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.NumberPicker
 import com.hansollee.mydays.R
+import com.hansollee.mydays.models.Time
 import java.util.Locale
 
 /**
@@ -58,24 +59,6 @@ class CustomTimePicker
         }
     }
 
-    data class Time(val hours: Int, val minutes: Int, val isAm: Boolean) {
-
-        companion object {
-            private const val MINUTE = 60 * 1000
-            private const val HOUR = 60 * MINUTE
-        }
-
-        val millis: Long
-            get() = if (isAm) {
-                hours * HOUR + minutes * MINUTE
-            } else {
-                (hours + 12) * HOUR + minutes * MINUTE
-            }.toLong()
-
-
-        fun minus(anotherTime: Time): Long = this.millis - anotherTime.millis
-    }
-
     companion object {
         private const val MIN_HOUR = 0
         private const val MAX_HOUR = 11
@@ -95,6 +78,9 @@ class CustomTimePicker
     private val hourPicker: NumberPicker
     private val minutePicker: NumberPicker
     private val amPmPicker: NumberPicker
+
+    val time: Time
+        get() = Time(hourPicker.value, minutePicker.value, isAm())
 
     init {
         orientation = LinearLayout.HORIZONTAL
@@ -164,6 +150,4 @@ class CustomTimePicker
             inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
         }
     }
-
-    fun getTime(): Time = Time(hourPicker.value, minutePicker.value, isAm())
 }

@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Record
+import com.hansollee.mydays.models.Time
 import com.hansollee.mydays.toDisplayFormat
+import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.CustomTimePicker
 import java.util.Date
 
@@ -39,13 +40,14 @@ class RecordEditorDialog : DialogFragment() {
         }
     }
 
+    private lateinit var recordFragViewModel: RecordFragmentViewModel
     private lateinit var fromTimePicker: CustomTimePicker
     private lateinit var toTimePicker: CustomTimePicker
     private lateinit var taskText: EditText
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        val recordFragViewModel = ViewModelProviders.of(activity).get(RecordFragmentViewModel::class.java)
+        recordFragViewModel = ViewModelProviders.of(activity).get(RecordFragmentViewModel::class.java)
         val view = inflater.inflate(R.layout.dialog_create_record, container, false)
 
         val currentDate: TextView = view.findViewById(R.id.current_date)
@@ -64,6 +66,7 @@ class RecordEditorDialog : DialogFragment() {
             // 우선 input들이 모두 valid한지 체크
             val validityCheckResult = getValidityCheckResult()
             if (validityCheckResult.isOk) {
+                recordFragViewModel.commitRecord(false, createRecordFromInputs())
                 dismiss()
             } else {
                 toast(validityCheckResult.errorMessage)
@@ -86,8 +89,8 @@ class RecordEditorDialog : DialogFragment() {
     }
 
     private fun getValidityCheckResult(): ValidityCheckResult {
-        val fromTime: CustomTimePicker.Time = fromTimePicker.getTime()
-        val toTime: CustomTimePicker.Time = toTimePicker.getTime()
+        val fromTime: Time = fromTimePicker.time
+        val toTime: Time = toTimePicker.time
         val timeDifference = toTime.minus(fromTime)
         if (timeDifference <= 0) {
             return ValidityCheckResult(false, "to는 from보다 늦은 시간이어야 합니다")
@@ -100,7 +103,7 @@ class RecordEditorDialog : DialogFragment() {
         return ValidityCheckResult(true, null)
     }
 
-    private fun toast(msg: String?) {
-        Toast.makeText(context, msg ?: "No Error Message", Toast.LENGTH_SHORT).show()
-    }
+    private fun createRecordFromInputs(): Record
+        = Record(recordFragViewModel.getCurrentDateLiveData().value,
+        fromTimePicker.time, toTimePicker.time, taskText.text.toString())
 }
