@@ -17,7 +17,7 @@ import org.threeten.bp.LocalDate
 
 @Dao
 interface RecordDao {
-    @Query("SELECT * FROM records WHERE date LIKE :date")
+    @Query("SELECT * FROM records WHERE date LIKE :date ORDER BY from_time ASC, to_time ASC")
     fun getRecordsByDate(date: LocalDate): Observable<List<Record>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
