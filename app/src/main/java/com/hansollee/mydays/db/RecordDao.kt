@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.hansollee.mydays.models.Record
+import io.reactivex.Completable
 import io.reactivex.Observable
 import org.threeten.bp.LocalDate
 
@@ -20,7 +21,7 @@ interface RecordDao {
     fun getRecordsByDate(date: LocalDate): Observable<List<Record>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insertRecord(record: Record)
+    fun insertRecord(record: Record): Completable
 
     @Update
     fun updateRecord(record: Record)

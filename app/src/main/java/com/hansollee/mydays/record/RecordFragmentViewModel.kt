@@ -9,6 +9,7 @@ import com.hansollee.mydays.models.Record
 import com.hansollee.mydays.toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import org.threeten.bp.LocalDate
 
 /**
@@ -45,7 +46,7 @@ class RecordFragmentViewModel: ViewModel() {
     }
 
     fun commitRecord(isNew: Boolean, record: Record) {
-        toast(record.toString())
+        recordDao.insertRecord(record).subscribeOn(Schedulers.io()).subscribe()
     }
 
     fun getRecordsLiveData(): LiveData<List<Record>> {
