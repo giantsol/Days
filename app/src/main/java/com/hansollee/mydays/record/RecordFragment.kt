@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -29,7 +28,7 @@ class RecordFragment: Fragment() {
 
         val floatingButton: FloatingActionButton = view.findViewById(R.id.floating_button)
         floatingButton.setOnClickListener { _ ->
-            showCreateRecordDialog()
+            showRecordEditorDialog()
         }
 
         val arrowBack: View = view.findViewById(R.id.arrow_back)
@@ -52,9 +51,9 @@ class RecordFragment: Fragment() {
         })
     }
 
-    private fun showCreateRecordDialog() {
+    private fun showRecordEditorDialog() {
         val transaction = fragmentManager.beginTransaction()
-        val dialog = CreateRecordDialog.newInstance()
+        val dialog = RecordEditorDialog.newInstance()
         dialog.show(transaction, null)
     }
 }

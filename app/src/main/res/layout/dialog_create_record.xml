@@ -23,7 +23,7 @@
         android:weightSum="7"
         >
 
-        <com.hansollee.mydays.CustomTimePicker
+        <com.hansollee.mydays.widgets.CustomTimePicker
             android:id="@+id/from_timepicker"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -37,7 +37,7 @@
             android:text=" - "
             />
 
-        <com.hansollee.mydays.CustomTimePicker
+        <com.hansollee.mydays.widgets.CustomTimePicker
             android:id="@+id/to_timepicker"
             android:layout_width="0dp"
             android:layout_height="match_parent"

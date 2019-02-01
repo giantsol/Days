@@ -1,4 +1,4 @@
-package com.hansollee.mydays
+package com.hansollee.mydays.widgets
 
 import android.app.Activity
 import android.content.Context
@@ -9,6 +9,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.NumberPicker
+import com.hansollee.mydays.R
 import java.util.Locale
 
 /**
