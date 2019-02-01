@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Record
-import com.hansollee.mydays.toDisplayFormat
+import com.hansollee.mydays.toStringFormat
 import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.CustomTimePicker
 import org.threeten.bp.LocalDate
@@ -73,7 +73,7 @@ class RecordEditorDialog : DialogFragment() {
         }
 
         recordFragViewModel.getCurrentDateLiveData().observe(this, Observer<LocalDate> { date ->
-            currentDate.text = date.toDisplayFormat()
+            currentDate.text = date.toStringFormat()
         })
 
         return view

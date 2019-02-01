@@ -10,7 +10,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hansollee.mydays.R
-import com.hansollee.mydays.toDisplayFormat
+import com.hansollee.mydays.models.Record
+import com.hansollee.mydays.toStringFormat
+import com.hansollee.mydays.toast
 import org.threeten.bp.LocalDate
 
 /**
@@ -47,7 +49,12 @@ class RecordFragment: Fragment() {
         }
 
         viewModel.getCurrentDateLiveData().observe(this, Observer<LocalDate> { currentDate ->
-            dateText.text = currentDate.toDisplayFormat()
+            dateText.text = currentDate.toStringFormat()
+            viewModel.loadRecordsForDate(currentDate)
+        })
+
+        viewModel.getRecordsLiveData().observe(this, Observer<List<Record>> { records ->
+            toast("${dateText.text}: $records")
         })
     }
 

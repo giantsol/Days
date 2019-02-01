@@ -7,13 +7,12 @@ import org.threeten.bp.format.DateTimeFormatter
  * Created by kevin-ee on 2019-01-31.
  */
 
-private val dateDisplayFormatter = DateTimeFormatter.ISO_DATE
+private val dateStringFormatter = DateTimeFormatter.ISO_DATE
 
-fun LocalDate.toDisplayFormat(): String {
-    val displayFormat = this.format(dateDisplayFormatter)
-    return if (this == LocalDate.now()) {
-        "$displayFormat (Today)"
-    } else {
-        displayFormat
-    }
+fun LocalDate.toStringFormat(): String {
+    return this.format(dateStringFormatter)
+}
+
+fun String.toLocalDate(): LocalDate {
+    return LocalDate.parse(this, dateStringFormatter)
 }

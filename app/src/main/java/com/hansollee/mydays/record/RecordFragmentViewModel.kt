@@ -3,8 +3,12 @@ package com.hansollee.mydays.record
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.hansollee.mydays.db.AppDatabase
+import com.hansollee.mydays.db.RecordDao
 import com.hansollee.mydays.models.Record
 import com.hansollee.mydays.toast
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import org.threeten.bp.LocalDate
 
 /**
@@ -13,6 +17,11 @@ import org.threeten.bp.LocalDate
 
 class RecordFragmentViewModel: ViewModel() {
     private lateinit var currentDateLiveData: MutableLiveData<LocalDate>
+    private lateinit var recordsLiveData: MutableLiveData<List<Record>>
+
+    private var getRecordsDisposable: Disposable? = null
+
+    private val recordDao: RecordDao = AppDatabase.getInstance().recordDao()
 
     fun getCurrentDateLiveData(): LiveData<LocalDate> {
         if (!::currentDateLiveData.isInitialized) {
@@ -39,4 +48,23 @@ class RecordFragmentViewModel: ViewModel() {
         toast(record.toString())
     }
 
+    fun getRecordsLiveData(): LiveData<List<Record>> {
+        if (!::recordsLiveData.isInitialized) {
+            recordsLiveData = MutableLiveData()
+            loadRecordsForDate(getCurrentDateLiveData().value)
+        }
+
+        return recordsLiveData
+    }
+
+    fun loadRecordsForDate(date: LocalDate) {
+        getRecordsDisposable?.dispose()
+        getRecordsDisposable = recordDao.getRecordsByDate(date)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { records -> recordsLiveData.value = records }
+    }
+
+    override fun onCleared() {
+        getRecordsDisposable?.dispose()
+    }
 }
