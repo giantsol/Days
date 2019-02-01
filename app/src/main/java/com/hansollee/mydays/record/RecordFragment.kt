@@ -25,7 +25,7 @@ class RecordFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val viewModel = ViewModelProviders.of(this).get(RecordFragmentViewModel::class.java)
+        val viewModel = ViewModelProviders.of(activity).get(RecordFragmentViewModel::class.java)
 
         val floatingButton: FloatingActionButton = view.findViewById(R.id.floating_button)
         floatingButton.setOnClickListener { _ ->
