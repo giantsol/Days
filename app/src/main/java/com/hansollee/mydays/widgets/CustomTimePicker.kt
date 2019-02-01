@@ -20,6 +20,62 @@ class CustomTimePicker
 @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : LinearLayout(context, attrs, defStyleAttr) {
 
+    private class TwoDigitFormatter internal constructor() : NumberPicker.Formatter {
+        internal val mBuilder = StringBuilder()
+
+        internal var mZeroDigit: Char = ' '
+        internal lateinit var mFmt: java.util.Formatter
+
+        internal val mArgs = arrayOfNulls<Any>(1)
+
+        init {
+            val locale = Locale.getDefault()
+            init(locale)
+        }
+
+        private fun init(locale: Locale) {
+            mFmt = createFormatter(locale)
+            mZeroDigit = getZeroDigit(locale)
+        }
+
+        override fun format(value: Int): String {
+            val currentLocale = Locale.getDefault()
+            if (mZeroDigit != getZeroDigit(currentLocale)) {
+                init(currentLocale)
+            }
+            mArgs[0] = value
+            mBuilder.delete(0, mBuilder.length)
+            mFmt.format("%02d", *mArgs)
+            return mFmt.toString()
+        }
+
+        private fun getZeroDigit(locale: Locale): Char {
+            return '0'
+        }
+
+        private fun createFormatter(locale: Locale): java.util.Formatter {
+            return java.util.Formatter(mBuilder, locale)
+        }
+    }
+
+    data class Time(val hours: Int, val minutes: Int, val isAm: Boolean) {
+
+        companion object {
+            private const val MINUTE = 60 * 1000
+            private const val HOUR = 60 * MINUTE
+        }
+
+        val millis: Long
+            get() = if (isAm) {
+                hours * HOUR + minutes * MINUTE
+            } else {
+                (hours + 12) * HOUR + minutes * MINUTE
+            }.toLong()
+
+
+        fun minus(anotherTime: Time): Long = this.millis - anotherTime.millis
+    }
+
     companion object {
         private const val MIN_HOUR = 0
         private const val MAX_HOUR = 11
@@ -109,41 +165,5 @@ class CustomTimePicker
         }
     }
 
-    private class TwoDigitFormatter internal constructor() : NumberPicker.Formatter {
-        internal val mBuilder = StringBuilder()
-
-        internal var mZeroDigit: Char = ' '
-        internal lateinit var mFmt: java.util.Formatter
-
-        internal val mArgs = arrayOfNulls<Any>(1)
-
-        init {
-            val locale = Locale.getDefault()
-            init(locale)
-        }
-
-        private fun init(locale: Locale) {
-            mFmt = createFormatter(locale)
-            mZeroDigit = getZeroDigit(locale)
-        }
-
-        override fun format(value: Int): String {
-            val currentLocale = Locale.getDefault()
-            if (mZeroDigit != getZeroDigit(currentLocale)) {
-                init(currentLocale)
-            }
-            mArgs[0] = value
-            mBuilder.delete(0, mBuilder.length)
-            mFmt.format("%02d", *mArgs)
-            return mFmt.toString()
-        }
-
-        private fun getZeroDigit(locale: Locale): Char {
-            return '0'
-        }
-
-        private fun createFormatter(locale: Locale): java.util.Formatter {
-            return java.util.Formatter(mBuilder, locale)
-        }
-    }
+    fun getTime(): Time = Time(hourPicker.value, minutePicker.value, isAm())
 }
