@@ -1,9 +1,6 @@
 package com.hansollee.mydays.db
 
 import androidx.room.TypeConverter
-import com.hansollee.mydays.toLocalDate
-import com.hansollee.mydays.toLocalTime
-import com.hansollee.mydays.toStringFormat
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 
@@ -13,12 +10,12 @@ import org.threeten.bp.LocalTime
 
 class Converters {
     @TypeConverter
-    fun dateToString(localDate: LocalDate): String = localDate.toStringFormat()
+    fun dateToEpoch(localDate: LocalDate): Long = localDate.toEpochDay()
     @TypeConverter
-    fun stringToDate(s: String): LocalDate = s.toLocalDate()
+    fun epochToDate(epoch: Long): LocalDate = LocalDate.ofEpochDay(epoch)
 
     @TypeConverter
-    fun timeToString(localTime: LocalTime): String = localTime.toStringFormat()
+    fun timeToSeconds(localTime: LocalTime): Int = localTime.toSecondOfDay()
     @TypeConverter
-    fun stringToTime(s: String): LocalTime = s.toLocalTime()
+    fun secondsToTime(seconds: Int): LocalTime = LocalTime.ofSecondOfDay(seconds.toLong())
 }

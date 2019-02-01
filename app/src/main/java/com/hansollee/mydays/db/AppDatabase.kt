@@ -4,6 +4,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.hansollee.mydays.appContext
 import com.hansollee.mydays.models.Record
 
@@ -18,7 +20,9 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         private val INSTANCE by lazy {
-            Room.databaseBuilder(appContext, AppDatabase::class.java, "myDaysDB").build()
+            Room.databaseBuilder(appContext, AppDatabase::class.java, "mydays.db")
+                .fallbackToDestructiveMigration()
+                .build()
         }
 
         fun getInstance() = INSTANCE

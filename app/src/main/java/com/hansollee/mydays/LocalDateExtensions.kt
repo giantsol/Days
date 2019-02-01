@@ -12,7 +12,3 @@ private val dateStringFormatter = DateTimeFormatter.ISO_DATE
 fun LocalDate.toStringFormat(): String {
     return this.format(dateStringFormatter)
 }
-
-fun String.toLocalDate(): LocalDate {
-    return LocalDate.parse(this, dateStringFormatter)
-}

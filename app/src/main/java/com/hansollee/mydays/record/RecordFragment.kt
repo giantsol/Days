@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Record
@@ -48,13 +50,18 @@ class RecordFragment: Fragment() {
             viewModel.resetCurrentDateToToday()
         }
 
+        val recordList: RecyclerView = view.findViewById(R.id.record_list)
+        recordList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        val recordListAdapter = RecordListAdapter(context, viewModel)
+        recordList.adapter = recordListAdapter
+
         viewModel.getCurrentDateLiveData().observe(this, Observer<LocalDate> { currentDate ->
             dateText.text = currentDate.toStringFormat()
             viewModel.loadRecordsForDate(currentDate)
         })
 
         viewModel.getRecordsLiveData().observe(this, Observer<List<Record>> { records ->
-            toast("${dateText.text}: $records")
+            recordListAdapter.setRecords(records)
         })
     }
 
