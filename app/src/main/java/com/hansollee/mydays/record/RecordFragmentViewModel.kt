@@ -16,21 +16,20 @@ import org.threeten.bp.LocalDate
  */
 
 class RecordFragmentViewModel: ViewModel() {
-    private lateinit var currentDateLiveData: MutableLiveData<LocalDate>
+    private val currentDateLiveData: MutableLiveData<LocalDate> = MutableLiveData()
     private lateinit var recordsLiveData: MutableLiveData<List<Record>>
+    private val isLoadingLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
     private var getRecordsDisposable: Disposable? = null
 
     private val recordDao: RecordDao = AppDatabase.getInstance().recordDao()
 
+    init {
+        currentDateLiveData.value = LocalDate.now()
+        isLoadingLiveData.value = true
+    }
+
     fun getCurrentDateLiveData(): LiveData<LocalDate> {
-        if (!::currentDateLiveData.isInitialized) {
-            currentDateLiveData = MutableLiveData()
-
-            // 현재 Date가 초기값
-            currentDateLiveData.value = LocalDate.now()
-        }
-
         return currentDateLiveData
     }
 
@@ -45,15 +44,27 @@ class RecordFragmentViewModel: ViewModel() {
     }
 
     fun insertNewRecord(record: Record) {
-        recordDao.insertRecord(record).subscribeOn(Schedulers.io()).subscribe()
+        recordDao.insertRecord(record).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                isLoadingLiveData.value = true
+            }
     }
 
     fun updateRecord(record: Record) {
-        recordDao.updateRecord(record).subscribeOn(Schedulers.io()).subscribe()
+        recordDao.updateRecord(record).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                isLoadingLiveData.value = true
+            }
     }
 
     fun deleteRecord(record: Record) {
-        recordDao.deleteRecord(record).subscribeOn(Schedulers.io()).subscribe()
+        recordDao.deleteRecord(record).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                isLoadingLiveData.value = true
+            }
     }
 
     fun getRecordsLiveData(): LiveData<List<Record>> {
@@ -69,7 +80,20 @@ class RecordFragmentViewModel: ViewModel() {
         getRecordsDisposable?.dispose()
         getRecordsDisposable = recordDao.getRecordsByDate(date)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { records -> recordsLiveData.value = records }
+            .doOnSubscribe { _ ->
+                isLoadingLiveData.value = true
+            }
+            .doFinally {
+                isLoadingLiveData.value = false
+            }
+            .subscribe { records ->
+                recordsLiveData.value = records
+                isLoadingLiveData.value = false
+            }
+    }
+
+    fun isLoading(): LiveData<Boolean> {
+        return isLoadingLiveData
     }
 
     override fun onCleared() {

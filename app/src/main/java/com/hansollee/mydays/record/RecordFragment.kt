@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -62,6 +63,17 @@ class RecordFragment: Fragment(), RecordListAdapter.RecordItemClickListener {
 
         viewModel.getRecordsLiveData().observe(this, Observer<List<Record>> { records ->
             recordListAdapter.setRecords(records)
+        })
+
+        val progressbar: View = view.findViewById(R.id.progress_bar)
+        viewModel.isLoading().observe(this, Observer<Boolean> { isLoading ->
+            if (isLoading) {
+                progressbar.visibility = View.VISIBLE
+                recordList.visibility = View.GONE
+            } else {
+                progressbar.visibility = View.GONE
+                recordList.visibility = View.VISIBLE
+            }
         })
     }
 
