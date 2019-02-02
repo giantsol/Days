@@ -9,6 +9,7 @@ import androidx.room.Update
 import com.hansollee.mydays.models.Record
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
 /**
@@ -19,6 +20,9 @@ import org.threeten.bp.LocalDate
 interface RecordDao {
     @Query("SELECT * FROM records WHERE date LIKE :date ORDER BY from_time ASC, to_time ASC")
     fun getRecordsByDate(date: LocalDate): Observable<List<Record>>
+
+    @Query("SELECT * FROM records WHERE date BETWEEN :from AND :to")
+    fun getRecordsBetweenDates(from: LocalDate, to: LocalDate): Single<List<Record>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertRecord(record: Record): Completable
