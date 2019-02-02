@@ -4,10 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="8dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginRight="8dp"
-    android:layout_marginEnd="8dp"
+    android:layout_marginLeft="@dimen/spacing_small"
+    android:layout_marginRight="@dimen/spacing_small"
     >
 
     <TextView
@@ -18,13 +16,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="@dimen/timepicker_height"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:weightSum="7"
         >
 
-        <com.hansollee.mydays.widgets.CustomTimePicker
+        <com.hansollee.mydays.widgets.SimpleTimePicker
             android:id="@+id/from_timepicker"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -38,7 +36,7 @@
             android:text=" - "
             />
 
-        <com.hansollee.mydays.widgets.CustomTimePicker
+        <com.hansollee.mydays.widgets.SimpleTimePicker
             android:id="@+id/to_timepicker"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -51,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="text"
-        android:hint="Write what you did"/>
+        android:hint="@string/hint_task_description"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -61,37 +59,35 @@
             android:id="@+id/cancel_button"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:padding="@dimen/spacing_small"
+            android:layout_marginLeft="@dimen/spacing_small"
+            android:layout_marginStart="@dimen/spacing_small"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:text="Cancel"
+            android:text="@string/button_cancel"
             />
 
         <Button
             android:id="@+id/delete_button"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:padding="@dimen/spacing_small"
             android:layout_centerInParent="true"
-            android:text="Delete"
+            android:text="@string/button_delete"
             />
 
         <Button
             android:id="@+id/ok_button"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:padding="@dimen/spacing_small"
+            android:layout_marginRight="@dimen/spacing_small"
+            android:layout_marginEnd="@dimen/spacing_small"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:text="Ok"
+            android:text="@string/button_ok"
             />
 
     </RelativeLayout>

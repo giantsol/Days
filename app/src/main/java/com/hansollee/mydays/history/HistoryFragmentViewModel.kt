@@ -17,48 +17,50 @@ import org.threeten.bp.LocalDate
  */
 
 class HistoryFragmentViewModel: ViewModel() {
-    val today: LocalDate = LocalDate.now()
-
     private val recordDao: RecordDao = AppDatabase.getInstance().recordDao()
 
-    private lateinit var historyItemsLiveData: MutableLiveData<List<History>>
-    private val historyItems: ArrayList<History> = ArrayList()
+    private lateinit var allHistoryItemsLiveData: MutableLiveData<List<History>>
+    private val allHistoryItems: ArrayList<History> = ArrayList()
 
-    private var pagingStartDate = today
+    private var pagingEndDate = LocalDate.now()
     private val pagingValue = 10L
 
-    private var getHistoriesDisposable: Disposable? = null
+    private var getHistoryItemsDisposable: Disposable? = null
 
     private val isLoading: Boolean
-        get() = getHistoriesDisposable?.isDisposed == false
+        get() = getHistoryItemsDisposable?.isDisposed == false
 
-    fun getHistoryItems(): LiveData<List<History>> {
-        if (!::historyItemsLiveData.isInitialized) {
-            historyItemsLiveData = MutableLiveData()
-            loadHistoryItems(pagingStartDate.minusDays(pagingValue), pagingStartDate)
+    fun getAllHistoryItems(): LiveData<List<History>> {
+        if (!::allHistoryItemsLiveData.isInitialized) {
+            allHistoryItemsLiveData = MutableLiveData()
+            loadNextHistoryItems(pagingEndDate.minusDays(pagingValue), pagingEndDate)
         }
-        return historyItemsLiveData
+        return allHistoryItemsLiveData
     }
 
-    private fun loadHistoryItems(startDate: LocalDate, endDate: LocalDate) {
+    // startDate ~ endDate 사이에 있는 Record들을 가져와서 allHistoryItems에 append시킴
+    private fun loadNextHistoryItems(startDate: LocalDate, endDate: LocalDate) {
         if (isLoading) {
             return
         }
 
-        getHistoriesDisposable = recordDao.getRecordsBetweenDates(startDate, endDate)
-            .map { records -> records.groupBy { it.date }.map { History(it.key, it.value) } }
+        getHistoryItemsDisposable = recordDao.getRecordsBetweenDates(startDate, endDate)
+            .map { records ->
+                records.groupBy { it.date }.map { History(it.key, it.value) }
+                    .sortedByDescending { it.date }
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe ({ histories ->
-                historyItems.addAll(histories)
-                pagingStartDate = endDate
-                historyItemsLiveData.value = historyItems
+                allHistoryItems.addAll(histories)
+                pagingEndDate = startDate.minusDays(1L)
+                allHistoryItemsLiveData.value = allHistoryItems
             }, { error ->
                 toast(error.message)
             })
     }
 
     override fun onCleared() {
-        getHistoriesDisposable?.dispose()
+        getHistoryItemsDisposable?.dispose()
     }
 }

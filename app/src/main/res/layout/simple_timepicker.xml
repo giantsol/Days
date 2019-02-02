@@ -4,40 +4,34 @@
     <NumberPicker
         android:id="@+id/hour"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:layout_marginLeft="4dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginLeft="@dimen/spacing_very_small"
+        android:layout_marginRight="@dimen/spacing_very_small"
         />
 
     <NumberPicker
         android:id="@+id/minute"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:layout_marginLeft="4dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginLeft="@dimen/spacing_very_small"
+        android:layout_marginRight="@dimen/spacing_very_small"
         />
 
     <NumberPicker
         android:id="@+id/amPm"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:layout_marginLeft="4dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginLeft="@dimen/spacing_very_small"
+        android:layout_marginRight="@dimen/spacing_very_small"
         />
 
 </merge>

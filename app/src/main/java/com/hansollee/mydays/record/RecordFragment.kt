@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -15,7 +14,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Record
 import com.hansollee.mydays.toStringFormat
-import com.hansollee.mydays.toast
 import org.threeten.bp.LocalDate
 
 /**
@@ -30,51 +28,55 @@ class RecordFragment: Fragment(), RecordListAdapter.RecordItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val viewModel = ViewModelProviders.of(activity).get(RecordFragmentViewModel::class.java)
-
         val floatingButton: FloatingActionButton = view.findViewById(R.id.floating_button)
+        val arrowBack: View = view.findViewById(R.id.arrow_back)
+        val arrowForward: View = view.findViewById(R.id.arrow_forward)
+        val dateText: TextView = view.findViewById(R.id.date_text)
+        val recordList: RecyclerView = view.findViewById(R.id.record_list)
+        val recordListAdapter = RecordListAdapter(context, viewModel, this)
+        val progressView: View = view.findViewById(R.id.progress_bar)
+
         floatingButton.setOnClickListener { _ ->
             showRecordEditorDialog()
         }
 
-        val arrowBack: View = view.findViewById(R.id.arrow_back)
         arrowBack.setOnClickListener { _ ->
             viewModel.changeCurrentDate(-1)
         }
 
-        val arrowForward: View = view.findViewById(R.id.arrow_forward)
         arrowForward.setOnClickListener { _ ->
             viewModel.changeCurrentDate(1)
         }
 
-        val dateText: TextView = view.findViewById(R.id.date_text)
         dateText.setOnClickListener { _ ->
             viewModel.resetCurrentDateToToday()
         }
 
-        val recordList: RecyclerView = view.findViewById(R.id.record_list)
-        recordList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        val recordListAdapter = RecordListAdapter(context, viewModel, this)
-        recordList.adapter = recordListAdapter
+        recordList.also {
+            it.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            it.adapter = recordListAdapter
+        }
 
-        viewModel.getCurrentDateLiveData().observe(this, Observer<LocalDate> { currentDate ->
-            dateText.text = currentDate.toStringFormat()
-            viewModel.loadRecordsForDate(currentDate)
-        })
+        viewModel.also {
+            it.getCurrentDate().observe(this, Observer<LocalDate> { currentDate ->
+                dateText.text = currentDate.toStringFormat()
+                viewModel.loadRecordsForDate(currentDate)
+            })
 
-        viewModel.getRecordsLiveData().observe(this, Observer<List<Record>> { records ->
-            recordListAdapter.setRecords(records)
-        })
+            it.getRecords().observe(this, Observer<List<Record>> { records ->
+                recordListAdapter.setRecords(records)
+            })
 
-        val progressbar: View = view.findViewById(R.id.progress_bar)
-        viewModel.isLoading().observe(this, Observer<Boolean> { isLoading ->
-            if (isLoading) {
-                progressbar.visibility = View.VISIBLE
-                recordList.visibility = View.GONE
-            } else {
-                progressbar.visibility = View.GONE
-                recordList.visibility = View.VISIBLE
-            }
-        })
+            it.getLoadingStatus().observe(this, Observer<Boolean> { isLoading ->
+                if (isLoading) {
+                    progressView.visibility = View.VISIBLE
+                    recordList.visibility = View.GONE
+                } else {
+                    progressView.visibility = View.GONE
+                    recordList.visibility = View.VISIBLE
+                }
+            })
+        }
     }
 
     private fun showRecordEditorDialog(record: Record? = null) {

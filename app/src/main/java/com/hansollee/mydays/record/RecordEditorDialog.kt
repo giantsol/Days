@@ -14,7 +14,7 @@ import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Record
 import com.hansollee.mydays.toStringFormat
 import com.hansollee.mydays.toast
-import com.hansollee.mydays.widgets.CustomTimePicker
+import com.hansollee.mydays.widgets.SimpleTimePicker
 import org.threeten.bp.LocalDate
 
 /**
@@ -40,32 +40,39 @@ class RecordEditorDialog : DialogFragment() {
     }
 
     private lateinit var recordFragViewModel: RecordFragmentViewModel
-    private lateinit var fromTimePicker: CustomTimePicker
-    private lateinit var toTimePicker: CustomTimePicker
+    private lateinit var currentDateText: TextView
+    private lateinit var fromTimePicker: SimpleTimePicker
+    private lateinit var toTimePicker: SimpleTimePicker
     private lateinit var taskText: EditText
 
+    // record를 클릭해서 열렸으면 Nonnull, 새로만들기 버튼을 클릭해서 열렸으면 null
     private var originalRecord: Record? = null
+
+    private lateinit var fromToInvalidMsg: String
+    private lateinit var taskDescriptionInvalidMsg: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
         originalRecord = arguments.getParcelable(KEY_RECORD)
 
-        recordFragViewModel = ViewModelProviders.of(activity).get(RecordFragmentViewModel::class.java)
         val view = inflater.inflate(R.layout.dialog_create_record, container, false)
-
-        val currentDate: TextView = view.findViewById(R.id.current_date)
-
+        recordFragViewModel = ViewModelProviders.of(activity).get(RecordFragmentViewModel::class.java)
+        currentDateText = view.findViewById(R.id.current_date)
         fromTimePicker = view.findViewById(R.id.from_timepicker)
         toTimePicker = view.findViewById(R.id.to_timepicker)
         taskText = view.findViewById(R.id.task_input)
-
         val cancelButton: Button = view.findViewById(R.id.cancel_button)
+        val deleteButton: Button = view.findViewById(R.id.delete_button)
+        val okButton: Button = view.findViewById(R.id.ok_button)
+
+        fromToInvalidMsg = context.resources.getString(R.string.from_and_to_invalid)
+        taskDescriptionInvalidMsg = context.resources.getString(R.string.task_description_invalid)
+
         cancelButton.setOnClickListener { _ ->
             dismiss()
         }
 
-        val deleteButton: Button = view.findViewById(R.id.delete_button)
         if (originalRecord != null) {
             deleteButton.visibility = View.VISIBLE
             deleteButton.setOnClickListener { _ ->
@@ -74,9 +81,9 @@ class RecordEditorDialog : DialogFragment() {
             }
         } else {
             deleteButton.visibility = View.GONE
+            deleteButton.setOnClickListener(null)
         }
 
-        val okButton: Button = view.findViewById(R.id.ok_button)
         okButton.setOnClickListener { _ ->
             // 우선 input들이 모두 valid한지 체크
             val validityCheckResult = getValidityCheckResult()
@@ -92,8 +99,8 @@ class RecordEditorDialog : DialogFragment() {
             }
         }
 
-        recordFragViewModel.getCurrentDateLiveData().observe(this, Observer<LocalDate> { date ->
-            currentDate.text = date.toStringFormat()
+        recordFragViewModel.getCurrentDate().observe(this, Observer<LocalDate> { date ->
+            currentDateText.text = date.toStringFormat()
         })
 
         if (originalRecord != null) {
@@ -106,20 +113,21 @@ class RecordEditorDialog : DialogFragment() {
     private fun getValidityCheckResult(): ValidityCheckResult {
         val fromTime = fromTimePicker.time
         val toTime = toTimePicker.time
-        if (fromTime > toTime) {
-            return ValidityCheckResult(false, "to는 from보다 늦은 시간이어야 합니다")
+        if (fromTime >= toTime) {
+            return ValidityCheckResult(false, fromToInvalidMsg)
         }
 
         if (taskText.text.trim().isEmpty()) {
-            return ValidityCheckResult(false, "Task에 글자를 적어주세요!")
+            return ValidityCheckResult(false, taskDescriptionInvalidMsg)
         }
 
         return ValidityCheckResult(true, null)
     }
 
-    private fun createNewRecordFromInputs(): Record
-        = Record(recordFragViewModel.getCurrentDateLiveData().value,
-        fromTimePicker.time, toTimePicker.time, taskText.text.toString())
+    private fun createNewRecordFromInputs(): Record {
+        val date = originalRecord?.date ?: recordFragViewModel.getCurrentDate().value
+        return Record(date, fromTimePicker.time, toTimePicker.time, taskText.text.toString())
+    }
 
     private fun getUpdatedRecordWithInputs(originalRecord: Record): Record
         = createNewRecordFromInputs().also { it.id = originalRecord.id }
@@ -127,6 +135,8 @@ class RecordEditorDialog : DialogFragment() {
     private fun fillViewsWithRecord(record: Record) {
         val fromTime = record.fromTime
         val toTime = record.toTime
+
+        currentDateText.text = record.date.toStringFormat()
 
         fromTimePicker.showTime(fromTime)
         toTimePicker.showTime(toTime)

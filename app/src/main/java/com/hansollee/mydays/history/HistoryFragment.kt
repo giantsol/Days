@@ -24,14 +24,13 @@ class HistoryFragment : Fragment(), HistoryListAdapter.HistoryItemClickListener 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val viewModel = ViewModelProviders.of(activity).get(HistoryFragmentViewModel::class.java)
-
         val historyList: RecyclerView = view.findViewById(R.id.history_list)
-
         val historyListAdapter = HistoryListAdapter(context, viewModel, this)
+
         historyList.layoutManager = LinearLayoutManager(context)
         historyList.adapter = historyListAdapter
 
-        viewModel.getHistoryItems().observe(this, Observer<List<History>> { items ->
+        viewModel.getAllHistoryItems().observe(this, Observer<List<History>> { items ->
             historyListAdapter.updateHistoryItems(items)
         })
     }

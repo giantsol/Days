@@ -29,13 +29,13 @@ class RecordFragmentViewModel: ViewModel() {
         isLoadingLiveData.value = true
     }
 
-    fun getCurrentDateLiveData(): LiveData<LocalDate> {
+    fun getCurrentDate(): LiveData<LocalDate> {
         return currentDateLiveData
     }
 
     // currentDate를 days만큼 앞/뒤로 이동시킨다
     fun changeCurrentDate(days: Int) {
-        val oneDayBefore = getCurrentDateLiveData().value.plusDays(days.toLong())
+        val oneDayBefore = getCurrentDate().value.plusDays(days.toLong())
         currentDateLiveData.value = oneDayBefore
     }
 
@@ -67,10 +67,10 @@ class RecordFragmentViewModel: ViewModel() {
             }
     }
 
-    fun getRecordsLiveData(): LiveData<List<Record>> {
+    fun getRecords(): LiveData<List<Record>> {
         if (!::recordsLiveData.isInitialized) {
             recordsLiveData = MutableLiveData()
-            loadRecordsForDate(getCurrentDateLiveData().value)
+            loadRecordsForDate(getCurrentDate().value)
         }
 
         return recordsLiveData
@@ -92,7 +92,7 @@ class RecordFragmentViewModel: ViewModel() {
             }
     }
 
-    fun isLoading(): LiveData<Boolean> {
+    fun getLoadingStatus(): LiveData<Boolean> {
         return isLoadingLiveData
     }
 

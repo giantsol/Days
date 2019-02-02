@@ -17,7 +17,9 @@ import java.util.Locale
  * Created by kevin-ee on 2019-02-01.
  */
 
-class CustomTimePicker
+// Android의 Timepicker는 width와 height를 변경해도 각각의 picker 크기가 안변해서 따로 만듦.
+// 그 외의 특별한 기능은 없음.
+class SimpleTimePicker
 @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : LinearLayout(context, attrs, defStyleAttr) {
 
@@ -73,17 +75,18 @@ class CustomTimePicker
         private val twoDigitFormatter = TwoDigitFormatter()
     }
 
-    private val inputMethodManager: InputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    private val inputMethodManager: InputMethodManager
+        = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
 
     private val hourPicker: NumberPicker
     private val minutePicker: NumberPicker
     private val amPmPicker: NumberPicker
 
-    private val hourIn24: Int
+    private val hourIn24Format: Int
         get() = if (isAm()) hourPicker.value else hourPicker.value + 12
 
     val time: LocalTime
-        get() = LocalTime.of(hourIn24, minutePicker.value)
+        get() = LocalTime.of(hourIn24Format, minutePicker.value)
 
     init {
         orientation = LinearLayout.HORIZONTAL
@@ -91,53 +94,61 @@ class CustomTimePicker
         weightSum = 3f
 
         val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(R.layout.custom_timepicker, this, true)
+        val view = inflater.inflate(R.layout.simple_timepicker, this, true)
 
         hourPicker = view.findViewById(R.id.hour)
         minutePicker = view.findViewById(R.id.minute)
         amPmPicker = view.findViewById(R.id.amPm)
 
-        hourPicker.minValue = MIN_HOUR
-        hourPicker.maxValue = MAX_HOUR
-        hourPicker.setFormatter(twoDigitFormatter)
-        hourPicker.setOnValueChangedListener { picker, oldVal, newVal ->
-            picker.requestFocus()
-            hideKeyboardIfFocused(picker)
-            if ((oldVal == MAX_HOUR && newVal == MIN_HOUR) ||
-                (oldVal == MIN_HOUR && newVal == MAX_HOUR)) {
-                invertAmPm()
+        hourPicker.also {
+            it.minValue = MIN_HOUR
+            it.maxValue = MAX_HOUR
+            it.setFormatter(twoDigitFormatter)
+            it.setOnValueChangedListener { picker, oldVal, newVal ->
+                picker.requestFocus()
+                hideKeyboardIfShown()
+
+                if ((oldVal == MAX_HOUR && newVal == MIN_HOUR) ||
+                    (oldVal == MIN_HOUR && newVal == MAX_HOUR)) {
+                    invertAmPm()
+                }
             }
         }
 
-        minutePicker.minValue = MIN_MINUTE
-        minutePicker.maxValue = MAX_MINUTE
-        minutePicker.setFormatter(twoDigitFormatter)
-        minutePicker.setOnValueChangedListener { picker, oldVal, newVal ->
-            picker.requestFocus()
-            hideKeyboardIfFocused(picker)
-            if (oldVal == MAX_MINUTE && newVal == MIN_MINUTE) {
-                // 59분에서 00분으로 넘어감
-                val newHour = hourPicker.value + 1
-                if (newHour > MAX_HOUR) {
-                    invertAmPm()
+        minutePicker.also {
+            it.minValue = MIN_MINUTE
+            it.maxValue = MAX_MINUTE
+            it.setFormatter(twoDigitFormatter)
+            it.setOnValueChangedListener { picker, oldVal, newVal ->
+                picker.requestFocus()
+                hideKeyboardIfShown()
+
+                if (oldVal == MAX_MINUTE && newVal == MIN_MINUTE) {
+                    // 59분에서 00분으로 넘어감
+                    val newHour = hourPicker.value + 1
+                    if (newHour > MAX_HOUR) {
+                        invertAmPm()
+                    }
+                    hourPicker.value = newHour
+                } else if (oldVal == MIN_MINUTE && newVal == MAX_MINUTE) {
+                    // 00분에서 59분으로 넘어감
+                    val newHour = hourPicker.value - 1
+                    if (newHour < MIN_HOUR) {
+                        invertAmPm()
+                    }
+                    hourPicker.value = newHour
                 }
-                hourPicker.value = newHour
-            } else if (oldVal == MIN_MINUTE && newVal == MAX_MINUTE) {
-                // 00분에서 59분으로 넘어감
-                val newHour = hourPicker.value - 1
-                if (newHour < MIN_HOUR) {
-                    invertAmPm()
-                }
-                hourPicker.value = newHour
             }
         }
 
-        amPmPicker.minValue = AM
-        amPmPicker.maxValue = PM
-        amPmPicker.displayedValues = amPmStrings
-        amPmPicker.setOnValueChangedListener { picker, oldVal, newVal ->
-            picker.requestFocus()
-            hideKeyboardIfFocused(picker)
+        amPmPicker.also {
+            it.minValue = AM
+            it.maxValue = PM
+            it.displayedValues = amPmStrings
+            it.setOnValueChangedListener { picker, oldVal, newVal ->
+                picker.requestFocus()
+                hideKeyboardIfShown()
+            }
         }
     }
 
@@ -147,13 +158,13 @@ class CustomTimePicker
 
     private fun isAm(): Boolean = amPmPicker.value == AM
 
-    private fun hideKeyboardIfFocused(view: View) {
-        if (inputMethodManager.isActive(view)) {
-            view.clearFocus()
+    private fun hideKeyboardIfShown() {
+        if (inputMethodManager.isActive) {
             inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
         }
     }
 
+    // 파라미터로 받은 time 값을 picker들에 보여줌
     fun showTime(time: LocalTime) {
         hourPicker.value = time.hour % 12
         minutePicker.value = time.minute
