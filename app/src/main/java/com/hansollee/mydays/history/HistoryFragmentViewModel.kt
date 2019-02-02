@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.hansollee.mydays.db.AppDatabase
 import com.hansollee.mydays.db.RecordDao
 import com.hansollee.mydays.models.History
+import com.hansollee.mydays.models.Record
 import com.hansollee.mydays.toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -46,7 +47,9 @@ class HistoryFragmentViewModel: ViewModel() {
 
         getHistoryItemsDisposable = recordDao.getRecordsBetweenDates(startDate, endDate)
             .map { records ->
-                records.groupBy { it.date }.map { History(it.key, it.value) }
+                records
+                    .groupBy { it.date }
+                    .map { History(it.key, it.value.sortedWith(compareBy(Record::fromTime, Record::toTime))) }
                     .sortedByDescending { it.date }
             }
             .subscribeOn(Schedulers.io())
