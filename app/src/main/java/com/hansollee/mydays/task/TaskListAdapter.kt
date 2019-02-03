@@ -1,6 +1,7 @@
 package com.hansollee.mydays.task
 
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,7 +35,7 @@ class TaskListAdapter(context: Context,
     override fun getItemCount(): Int = tasks.size
 
     override fun onBindViewHolder(holder: TaskItemViewHolder, position: Int) {
-        holder.bind(tasks[position], itemClickListener)
+        holder.bind(tasks[position], itemClickListener, taskFragViewModel)
     }
 
     fun setTasks(newTasks: List<Task>) {
@@ -57,10 +58,16 @@ class TaskListAdapter(context: Context,
         private val timeRange: TextView = view.findViewById(R.id.time_range)
         private val taskDescription: TextView = view.findViewById(R.id.task_description)
 
-        fun bind(task: Task, itemClickListener: ItemClickListener) {
+        fun bind(task: Task, itemClickListener: ItemClickListener, viewModel: TaskFragmentViewModel) {
+            if (task.colorInt == 0) {
+                (thumbnail.drawable.mutate() as ColorDrawable).color = viewModel.defaultTaskColor
+            } else {
+                (thumbnail.drawable.mutate() as ColorDrawable).color = task.colorInt
+            }
+
             timeRange.text = String.format(TIME_RANGE_FORMAT,
                 task.fromTime.toStringFormat(), task.toTime.toStringFormat())
-            taskDescription.text = task.task
+            taskDescription.text = task.desc
 
             contentContainer.setOnClickListener { _ ->
                 itemClickListener.onItemClick(task)

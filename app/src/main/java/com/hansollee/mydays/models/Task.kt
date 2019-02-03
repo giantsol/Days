@@ -18,7 +18,8 @@ import org.threeten.bp.LocalTime
 data class Task(@ColumnInfo(name = "date") val date: LocalDate,
                 @ColumnInfo(name = "from_time") val fromTime: LocalTime,
                 @ColumnInfo(name = "to_time") val toTime: LocalTime,
-                @ColumnInfo(name = "task_description") val task: String) : Parcelable {
+                @ColumnInfo(name = "task_description") val desc: String,
+                @ColumnInfo(name = "color_int") val colorInt: Int) : Parcelable {
 
     @PrimaryKey(autoGenerate = true) var id = 0L
 
@@ -26,7 +27,8 @@ data class Task(@ColumnInfo(name = "date") val date: LocalDate,
         parcel.readSerializable() as LocalDate,
         parcel.readSerializable() as LocalTime,
         parcel.readSerializable() as LocalTime,
-        parcel.readString()
+        parcel.readString(),
+        parcel.readInt()
     ) {
         this.id = parcel.readLong()
     }
@@ -35,7 +37,8 @@ data class Task(@ColumnInfo(name = "date") val date: LocalDate,
         dest.writeSerializable(date)
         dest.writeSerializable(fromTime)
         dest.writeSerializable(toTime)
-        dest.writeString(task)
+        dest.writeString(desc)
+        dest.writeInt(colorInt)
         dest.writeLong(id)
     }
 

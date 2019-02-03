@@ -11,7 +11,7 @@ import com.hansollee.mydays.models.Task
  * Created by kevin-ee on 2019-02-01.
  */
 
-@Database(entities = arrayOf(Task::class), version = 1)
+@Database(entities = arrayOf(Task::class), version = 2)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
@@ -24,5 +24,6 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         fun getInstance() = INSTANCE
+
     }
 }

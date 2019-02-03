@@ -1,11 +1,13 @@
 package com.hansollee.mydays.task
 
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
@@ -40,6 +42,7 @@ class TaskEditorDialog : DialogFragment() {
     private lateinit var fromTimePicker: SimpleTimePicker
     private lateinit var toTimePicker: SimpleTimePicker
     private lateinit var taskText: EditText
+    private lateinit var thumbnail: ImageView
 
     // task를 클릭해서 열렸으면 Nonnull, 새로만들기 버튼을 클릭해서 열렸으면 null
     private var originalTask: Task? = null
@@ -60,6 +63,7 @@ class TaskEditorDialog : DialogFragment() {
         fromTimePicker = view.findViewById(R.id.start_timepicker)
         toTimePicker = view.findViewById(R.id.end_timepicker)
         taskText = view.findViewById(R.id.task_input)
+        thumbnail = view.findViewById(R.id.thumbnail)
         val cancelButton: Button = view.findViewById(R.id.cancel_button)
         val deleteButton: Button = view.findViewById(R.id.delete_button)
         val okButton: Button = view.findViewById(R.id.ok_button)
@@ -129,7 +133,8 @@ class TaskEditorDialog : DialogFragment() {
 
     private fun createNewTaskFromInputs(): Task {
         val date = originalTask?.date ?: taskFragViewModel.getCurrentDate().value
-        return Task(date, fromTimePicker.time, toTimePicker.time, taskText.text.toString())
+        return Task(date, fromTimePicker.time, toTimePicker.time, taskText.text.toString(),
+            (thumbnail.drawable as ColorDrawable).color)
     }
 
     private fun getUpdatedTaskWithInputs(originalTask: Task): Task
@@ -142,7 +147,12 @@ class TaskEditorDialog : DialogFragment() {
         fromTimePicker.showTime(fromTime)
         toTimePicker.showTime(toTime)
 
-        taskText.setText(task.task)
+        taskText.setText(task.desc)
+        if (task.colorInt == 0) {
+            (thumbnail.drawable.mutate() as ColorDrawable).color = taskFragViewModel.defaultTaskColor
+        } else {
+            (thumbnail.drawable.mutate() as ColorDrawable).color = task.colorInt
+        }
     }
 
     override fun onStart() {
