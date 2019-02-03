@@ -60,6 +60,7 @@ class HistoryListAdapter(context: Context,
                  @ColorInt defGraphColor: Int) {
             date.text = history.date.toStringFormat()
             graph.setDefaultColor(defGraphColor)
+            graph.drawHistory(history)
         }
 
     }

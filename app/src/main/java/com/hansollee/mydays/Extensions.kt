@@ -37,3 +37,6 @@ private val timeStringFormatter = DateTimeFormatterBuilder()
 fun LocalTime.toStringFormat(): String {
     return this.format(timeStringFormatter)
 }
+
+private val MINUTES_PER_HOUR = 60
+fun LocalTime.toMinuteOfDay(): Int = hour * MINUTES_PER_HOUR + minute
