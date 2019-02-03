@@ -13,12 +13,12 @@ import org.threeten.bp.LocalTime
  * Created by kevin-ee on 2019-02-01.
  */
 
-@Entity(tableName = "records",
+@Entity(tableName = "tasks",
     indices = arrayOf(Index(value = ["date"])))
-data class Record(@ColumnInfo(name = "date") val date: LocalDate,
-                  @ColumnInfo(name = "from_time") val fromTime: LocalTime,
-                  @ColumnInfo(name = "to_time") val toTime: LocalTime,
-                  @ColumnInfo(name = "task_description") val task: String) : Parcelable {
+data class Task(@ColumnInfo(name = "date") val date: LocalDate,
+                @ColumnInfo(name = "from_time") val fromTime: LocalTime,
+                @ColumnInfo(name = "to_time") val toTime: LocalTime,
+                @ColumnInfo(name = "task_description") val task: String) : Parcelable {
 
     @PrimaryKey(autoGenerate = true) var id = 0L
 
@@ -41,12 +41,12 @@ data class Record(@ColumnInfo(name = "date") val date: LocalDate,
 
     override fun describeContents(): Int = 0
 
-    companion object CREATOR : Parcelable.Creator<Record> {
-        override fun createFromParcel(parcel: Parcel): Record {
-            return Record(parcel)
+    companion object CREATOR : Parcelable.Creator<Task> {
+        override fun createFromParcel(parcel: Parcel): Task {
+            return Task(parcel)
         }
 
-        override fun newArray(size: Int): Array<Record?> {
+        override fun newArray(size: Int): Array<Task?> {
             return arrayOfNulls(size)
         }
     }

@@ -6,15 +6,13 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textAppearance">@style/MyTextAppearance</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="colorControlActivated">?attr/colorPrimary</item>
     </style>
 
     <style name="Toolbar" parent="@style/ThemeOverlay.AppCompat.Dark">
-        <item name="colorControlNormal">@color/text_heading1</item>
-        <item name="titleTextColor">@color/text_heading1</item>
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="titleTextColor">@android:color/white</item>
     </style>
 
-    <style name="MyTextAppearance" parent="@style/TextAppearance.AppCompat">
-        <item name="android:includeFontPadding">false</item>
-    </style>
 </resources>

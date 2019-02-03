@@ -2,6 +2,7 @@ package com.hansollee.mydays
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 
@@ -23,6 +24,9 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         tabAdapter = MainTabAdapter(supportFragmentManager)
         viewPager.adapter = tabAdapter
         tabLayout.setupWithViewPager(viewPager)
+        tabLayout.setTabTextColors(
+            ContextCompat.getColor(this, R.color.tab_unselected),
+            ContextCompat.getColor(this, R.color.tab_selected))
 
     }
 

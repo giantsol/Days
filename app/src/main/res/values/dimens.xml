@@ -5,6 +5,32 @@
     <dimen name="spacing_normal">12dp</dimen>
     <dimen name="spacing_big">16dp</dimen>
     <dimen name="spacing_very_big">20dp</dimen>
+    <dimen name="spacing_very_very_big">24dp</dimen>
+    <dimen name="spacing_very_very_very_big">28dp</dimen>
 
-    <dimen name="timepicker_height">100dp</dimen>
+    <dimen name="top_shadow_height">4dp</dimen>
+
+    <dimen name="task_fragment_current_date_textsize">16dp</dimen>
+
+    <dimen name="task_item_height">70dp</dimen>
+    <dimen name="task_item_side_margin">6dp</dimen>
+    <dimen name="task_item_bottom_margin">4dp</dimen>
+    <dimen name="task_item_thumbnail_size">40dp</dimen>
+    <dimen name="task_item_thumbnail_margin_left">8dp</dimen>
+    <dimen name="task_item_content_margin_left">16dp</dimen>
+    <dimen name="task_item_time_range_textsize">12sp</dimen>
+    <dimen name="task_item_task_desc_textsize">16sp</dimen>
+    <dimen name="task_item_time_desc_spacing">4dp</dimen>
+
+    <dimen name="task_editor_dialog_side_margin">16dp</dimen>
+    <dimen name="task_editor_dialog_title_left_margin">24dp</dimen>
+    <dimen name="task_editor_dialog_title_textsize">20sp</dimen>
+    <dimen name="task_editor_dialog_header_bottom_margin">16dp</dimen>
+    <dimen name="task_editor_dialog_time_desc_textsize">16sp</dimen>
+    <dimen name="task_editor_dialog_timepicker_height">100dp</dimen>
+    <dimen name="task_editor_dialog_timepicker_top_margin">16dp</dimen>
+    <dimen name="task_editor_dialog_task_desc_side_margin">16dp</dimen>
+    <dimen name="task_editor_dialog_task_desc_textsize">16sp</dimen>
+    <dimen name="task_editor_dialog_timepicker_bottom_margin">26dp</dimen>
+    <dimen name="task_editor_dialog_task_desc_bottom_margin">12dp</dimen>
 </resources>

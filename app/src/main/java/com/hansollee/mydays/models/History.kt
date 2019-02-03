@@ -7,4 +7,4 @@ import org.threeten.bp.LocalDate
  */
 
 data class History(val date: LocalDate,
-                   val records: List<Record>)
+                   val tasks: List<Task>)

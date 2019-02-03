@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginLeft="@dimen/task_editor_dialog_side_margin"
+    android:layout_marginRight="@dimen/task_editor_dialog_side_margin"
+    >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:layout_marginBottom="@dimen/task_editor_dialog_header_bottom_margin"
+        >
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/task_editor_dialog_title_left_margin"
+            android:layout_marginStart="@dimen/task_editor_dialog_title_left_margin"
+            android:textSize="@dimen/task_editor_dialog_title_textsize"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_vertical"
+            />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/task_editor_dialog_timepicker_bottom_margin"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/start_time_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/task_editor_dialog_time_desc_textsize"
+                android:textColor="@color/grey"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
+                />
+
+            <com.hansollee.mydays.widgets.SimpleTimePicker
+                android:id="@+id/start_timepicker"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/task_editor_dialog_timepicker_height"
+                android:layout_marginTop="@dimen/task_editor_dialog_timepicker_top_margin"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/end_time_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/task_editor_dialog_time_desc_textsize"
+                android:textColor="@color/grey"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="4dp"
+                android:layout_marginEnd="4dp"
+                />
+
+            <com.hansollee.mydays.widgets.SimpleTimePicker
+                android:id="@+id/end_timepicker"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/task_editor_dialog_timepicker_height"
+                android:layout_marginTop="@dimen/task_editor_dialog_timepicker_top_margin"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="@dimen/task_editor_dialog_task_desc_side_margin"
+        android:layout_marginRight="@dimen/task_editor_dialog_task_desc_side_margin"
+        android:layout_marginBottom="@dimen/task_editor_dialog_task_desc_bottom_margin"
+        android:gravity="center_vertical"
+        >
+
+        <EditText
+            android:id="@+id/task_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="text"
+            android:textSize="@dimen/task_editor_dialog_task_desc_textsize"
+            android:textColorHint="@color/grey"
+            android:textColor="@android:color/black"
+            android:hint="@string/hint_task_description"/>
+
+        <com.hansollee.mydays.widgets.CircularImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="@dimen/task_item_thumbnail_size"
+            android:layout_height="@dimen/task_item_thumbnail_size"
+            android:layout_marginLeft="@dimen/task_item_thumbnail_margin_left"
+            android:layout_marginStart="@dimen/task_item_thumbnail_margin_left"
+            android:src="@color/grey"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical|end"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="16dp"
+        android:paddingEnd="16dp"
+        >
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/grey"
+            android:text="@string/button_cancel"
+            style="?android:attr/buttonBarButtonStyle"
+            />
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:textSize="14sp"
+            android:textColor="@color/colorAccent"
+            android:text="@string/button_delete"
+            style="?android:attr/buttonBarButtonStyle"
+            />
+
+        <Button
+            android:id="@+id/ok_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:textSize="14sp"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/button_ok"
+            style="?android:attr/buttonBarButtonStyle"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

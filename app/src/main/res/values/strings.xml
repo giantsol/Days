@@ -1,15 +1,21 @@
 <resources>
     <string name="app_name">MyDays</string>
 
-    <string name="record_fragment_title">Record</string>
+    <string name="task_fragment_title">Tasks</string>
     <string name="history_fragment_title">History</string>
 
     <string name="from_and_to_invalid">End time should be larger than start time!</string>
     <string name="task_description_invalid">Please fill in task description!</string>
 
-    <string name="hint_task_description">Your task</string>
+    <string name="hint_task_description">Write what you did</string>
 
     <string name="button_cancel">Cancel</string>
     <string name="button_delete">Delete</string>
     <string name="button_ok">Ok</string>
+
+    <string name="create_new_task_title">Create New Task</string>
+    <string name="edit_task_title">Edit Task</string>
+
+    <string name="start_time_desc">Start Time</string>
+    <string name="end_time_desc">End Time</string>
 </resources>

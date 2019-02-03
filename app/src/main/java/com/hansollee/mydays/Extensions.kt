@@ -4,15 +4,29 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
+import org.threeten.bp.format.SignStyle
+import org.threeten.bp.format.TextStyle
 import org.threeten.bp.temporal.ChronoField
 
 /**
  * Created by kevin-ee on 2019-02-02.
  */
 
-private val dateStringFormatter = DateTimeFormatter.ISO_DATE
+private val dateStringFormatter = DateTimeFormatterBuilder()
+    .appendValue(ChronoField.YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
+    .appendLiteral('-')
+    .appendValue(ChronoField.MONTH_OF_YEAR, 2)
+    .appendLiteral('-')
+    .appendValue(ChronoField.DAY_OF_MONTH, 2)
+    .appendLiteral(' ')
+    .appendText(ChronoField.DAY_OF_WEEK, TextStyle.SHORT_STANDALONE)
+    .toFormatter()
 fun LocalDate.toStringFormat(): String {
-    return this.format(dateStringFormatter)
+    return if (this == LocalDate.now()) {
+        "${this.format(dateStringFormatter)} (Today)"
+    } else {
+        this.format(dateStringFormatter)
+    }
 }
 
 private val timeStringFormatter = DateTimeFormatterBuilder()

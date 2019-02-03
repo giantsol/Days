@@ -13,7 +13,7 @@ import com.hansollee.mydays.models.History
  */
 
 class HistoryListAdapter(context: Context,
-                        private val recordFragViewModel: HistoryFragmentViewModel,
+                        private val historyFragViewModel: HistoryFragmentViewModel,
                         private val itemClickListener: HistoryItemClickListener)
     : RecyclerView.Adapter<HistoryListAdapter.HistoryItemViewHolder>() {
 

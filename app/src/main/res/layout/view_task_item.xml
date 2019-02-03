@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/task_item_bottom_margin"
+    android:layout_marginLeft="@dimen/task_item_side_margin"
+    android:layout_marginRight="@dimen/task_item_side_margin"
+    android:background="@drawable/card_bg"
+    >
+
+    <LinearLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/task_item_height"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:background="@drawable/button_background"
+        >
+
+        <com.hansollee.mydays.widgets.CircularImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="@dimen/task_item_thumbnail_size"
+            android:layout_height="@dimen/task_item_thumbnail_size"
+            android:layout_marginLeft="@dimen/task_item_thumbnail_margin_left"
+            android:layout_marginStart="@dimen/task_item_thumbnail_margin_left"
+            android:src="@color/grey"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginLeft="@dimen/task_item_content_margin_left"
+            android:layout_marginStart="@dimen/task_item_content_margin_left"
+            android:gravity="center_vertical"
+            >
+
+            <TextView
+                android:id="@+id/time_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/task_item_time_range_textsize"
+                android:textColor="@color/grey"
+                />
+
+            <TextView
+                android:id="@+id/task_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/task_item_task_desc_textsize"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="@dimen/task_item_time_desc_spacing"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

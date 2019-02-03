@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-
-    <color name="text_heading1">#FFFFFF</color>
+    <color name="colorPrimary">#019ae8</color>
+    <color name="colorPrimaryDark">#0076bf</color>
+    <color name="colorAccent">#ff5722</color>
 
     <color name="button_unselected">#FFFFFF</color>
-    <color name="button_selected">#eeeeee</color>
+    <color name="button_selected">#1F000000</color>
 
-    <color name="page_background">#FFFFFF</color>
+    <color name="grey">#89000000</color>
+
+    <color name="tab_selected">#FFFFFFFF</color>
+    <color name="tab_unselected">#B2FFFFFF</color>
 </resources>

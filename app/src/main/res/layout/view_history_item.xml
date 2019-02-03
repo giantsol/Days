@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_vertical"
-    android:background="@drawable/record_item_background"
+    android:background="@drawable/task_item_background"
     android:clickable="true"
     android:paddingTop="@dimen/spacing_big"
     android:paddingBottom="@dimen/spacing_big">

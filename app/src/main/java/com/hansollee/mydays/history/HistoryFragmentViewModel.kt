@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.hansollee.mydays.db.AppDatabase
-import com.hansollee.mydays.db.RecordDao
+import com.hansollee.mydays.db.TaskDao
 import com.hansollee.mydays.models.History
-import com.hansollee.mydays.models.Record
+import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -18,7 +18,7 @@ import org.threeten.bp.LocalDate
  */
 
 class HistoryFragmentViewModel: ViewModel() {
-    private val recordDao: RecordDao = AppDatabase.getInstance().recordDao()
+    private val taskDao: TaskDao = AppDatabase.getInstance().taskDao()
 
     private lateinit var allHistoryItemsLiveData: MutableLiveData<List<History>>
     private val allHistoryItems: ArrayList<History> = ArrayList()
@@ -39,17 +39,17 @@ class HistoryFragmentViewModel: ViewModel() {
         return allHistoryItemsLiveData
     }
 
-    // startDate ~ endDate 사이에 있는 Record들을 가져와서 allHistoryItems에 append시킴
+    // startDate ~ endDate 사이에 있는 Task들을 가져와서 allHistoryItems에 append시킴
     private fun loadNextHistoryItems(startDate: LocalDate, endDate: LocalDate) {
         if (isLoading) {
             return
         }
 
-        getHistoryItemsDisposable = recordDao.getRecordsBetweenDates(startDate, endDate)
-            .map { records ->
-                records
+        getHistoryItemsDisposable = taskDao.getTasksBetweenDates(startDate, endDate)
+            .map { tasks ->
+                tasks
                     .groupBy { it.date }
-                    .map { History(it.key, it.value.sortedWith(compareBy(Record::fromTime, Record::toTime))) }
+                    .map { History(it.key, it.value.sortedWith(compareBy(Task::fromTime, Task::toTime))) }
                     .sortedByDescending { it.date }
             }
             .subscribeOn(Schedulers.io())
