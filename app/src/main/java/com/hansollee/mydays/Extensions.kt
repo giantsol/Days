@@ -22,7 +22,7 @@ private val dateStringFormatter = DateTimeFormatterBuilder()
     .appendText(ChronoField.DAY_OF_WEEK, TextStyle.SHORT_STANDALONE)
     .toFormatter()
 fun LocalDate.toStringFormat(): String {
-    return if (this == LocalDate.now()) {
+    return if (this == today) {
         "${this.format(dateStringFormatter)} (Today)"
     } else {
         this.format(dateStringFormatter)

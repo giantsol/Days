@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="HistoryGraphView">
+        <attr name="graphHeight" format="dimension" />
+        <attr name="xAxisTextSize" format="dimension" />
+    </declare-styleable>
+
+</resources>

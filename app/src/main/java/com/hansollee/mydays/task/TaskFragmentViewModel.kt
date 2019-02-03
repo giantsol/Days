@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.hansollee.mydays.db.AppDatabase
 import com.hansollee.mydays.db.TaskDao
 import com.hansollee.mydays.models.Task
+import com.hansollee.mydays.today
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -25,7 +26,7 @@ class TaskFragmentViewModel: ViewModel() {
     private val taskDao: TaskDao = AppDatabase.getInstance().taskDao()
 
     init {
-        currentDateLiveData.value = LocalDate.now()
+        currentDateLiveData.value = today
         isLoadingLiveData.value = true
     }
 
@@ -40,7 +41,7 @@ class TaskFragmentViewModel: ViewModel() {
     }
 
     fun resetCurrentDateToToday() {
-        currentDateLiveData.value = LocalDate.now()
+        currentDateLiveData.value = today
     }
 
     fun insertNewTask(task: Task) {

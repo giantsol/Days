@@ -11,4 +11,6 @@
 
     <color name="tab_selected">#FFFFFFFF</color>
     <color name="tab_unselected">#B2FFFFFF</color>
+
+    <color name="default_history_graph_color">#D8D8D8</color>
 </resources>

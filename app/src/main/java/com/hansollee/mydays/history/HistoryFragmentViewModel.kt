@@ -8,6 +8,7 @@ import com.hansollee.mydays.db.TaskDao
 import com.hansollee.mydays.models.History
 import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.toast
+import com.hansollee.mydays.today
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -23,7 +24,7 @@ class HistoryFragmentViewModel: ViewModel() {
     private lateinit var allHistoryItemsLiveData: MutableLiveData<List<History>>
     private val allHistoryItems: ArrayList<History> = ArrayList()
 
-    private var pagingEndDate = LocalDate.now()
+    private var pagingEndDate = today
     private val pagingValue = 10L
 
     private var getHistoryItemsDisposable: Disposable? = null

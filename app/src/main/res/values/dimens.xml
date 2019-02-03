@@ -12,7 +12,6 @@
 
     <dimen name="task_fragment_current_date_textsize">16dp</dimen>
 
-    <dimen name="task_item_height">70dp</dimen>
     <dimen name="task_item_side_margin">6dp</dimen>
     <dimen name="task_item_bottom_margin">4dp</dimen>
     <dimen name="task_item_thumbnail_size">40dp</dimen>
