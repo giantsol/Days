@@ -41,4 +41,6 @@ dependencies {
 
     // backport of java.time
     implementation 'org.threeten:threetenbp:1.3.8'
+
+    implementation 'com.jaredrummler:colorpicker:1.1.0'
 }

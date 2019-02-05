@@ -15,17 +15,20 @@ import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.SimpleTimePicker
+import com.jaredrummler.android.colorpicker.ColorPickerDialog
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 
 /**
  * Created by kevin-ee on 2019-02-01.
  */
 
-class TaskEditorDialog : DialogFragment() {
+class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
 
     private data class ValidityCheckResult(val isOk: Boolean, val errorMessage: String?)
 
     companion object {
         private const val KEY_TASK = "key.task"
+        private const val KEY_THUMBNAIL_COLOR = "key.thumbnail.color"
 
         fun newInstance(task: Task? = null): TaskEditorDialog {
             val instance = TaskEditorDialog()
@@ -49,6 +52,9 @@ class TaskEditorDialog : DialogFragment() {
 
     private lateinit var fromToInvalidMsg: String
     private lateinit var taskDescriptionInvalidMsg: String
+
+    private val currentThumbnailColor: Int
+        get() = (thumbnail.drawable as ColorDrawable).color
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -79,6 +85,19 @@ class TaskEditorDialog : DialogFragment() {
         title.text = if (originalTask == null) createNewTaskTitle else editTaskTitle
         startTimeDescView.text = startTimeDesc
         endTimeDescView.text = endTimeDesc
+
+        (fragmentManager.findFragmentByTag("ColorPicker") as? ColorPickerDialog)
+            ?.setColorPickerDialogListener(this)
+
+        thumbnail.setOnClickListener { _ ->
+            ColorPickerDialog.newBuilder()
+                .setColor(currentThumbnailColor)
+                .setDialogType(ColorPickerDialog.TYPE_CUSTOM)
+                .setShowAlphaSlider(true)
+                .create()
+                .apply { setColorPickerDialogListener(this@TaskEditorDialog) }
+                .show(fragmentManager, "ColorPicker")
+        }
 
         cancelButton.setOnClickListener { _ ->
             dismiss()
@@ -112,6 +131,10 @@ class TaskEditorDialog : DialogFragment() {
 
         if (originalTask != null) {
             fillViewsWithTask(originalTask!!)
+        }
+
+        if (savedInstanceState != null) {
+            updateThumbnailColor(savedInstanceState.getInt(KEY_THUMBNAIL_COLOR), taskFragViewModel.defaultTaskColor)
         }
 
         return view
@@ -148,11 +171,7 @@ class TaskEditorDialog : DialogFragment() {
         toTimePicker.showTime(toTime)
 
         taskText.setText(task.desc)
-        if (task.colorInt == 0) {
-            (thumbnail.drawable.mutate() as ColorDrawable).color = taskFragViewModel.defaultTaskColor
-        } else {
-            (thumbnail.drawable.mutate() as ColorDrawable).color = task.colorInt
-        }
+        updateThumbnailColor(task.colorInt, taskFragViewModel.defaultTaskColor)
     }
 
     override fun onStart() {
@@ -161,5 +180,26 @@ class TaskEditorDialog : DialogFragment() {
             it.window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             it.setCanceledOnTouchOutside(false)
         }
+    }
+
+    override fun onDialogDismissed(dialogId: Int) {
+
+    }
+
+    override fun onColorSelected(dialogId: Int, color: Int) {
+        updateThumbnailColor(color, taskFragViewModel.defaultTaskColor)
+    }
+
+    private fun updateThumbnailColor(color: Int, defColor: Int) {
+        if (color == 0) {
+            (thumbnail.drawable.mutate() as ColorDrawable).color = defColor
+        } else {
+            (thumbnail.drawable.mutate() as ColorDrawable).color = color
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_THUMBNAIL_COLOR, currentThumbnailColor)
     }
 }
