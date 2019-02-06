@@ -131,6 +131,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
 
         if (originalTask != null) {
             fillViewsWithTask(originalTask!!)
+        } else {
+            taskFragViewModel.getTasks().value.lastOrNull()?.also { lastTask ->
+                fromTimePicker.showTime(lastTask.toTime)
+                toTimePicker.showTime(lastTask.toTime)
+            }
         }
 
         if (savedInstanceState != null) {
@@ -143,7 +148,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
     private fun getValidityCheckResult(): ValidityCheckResult {
         val fromTime = fromTimePicker.time
         val toTime = toTimePicker.time
-        if (fromTime >= toTime) {
+        if (fromTime > toTime) {
             return ValidityCheckResult(false, fromToInvalidMsg)
         }
 
