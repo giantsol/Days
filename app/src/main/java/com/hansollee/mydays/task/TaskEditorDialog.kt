@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Task
+import com.hansollee.mydays.models.TaskDescription
 import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.SimpleTimePicker
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
@@ -22,13 +23,16 @@ import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
  * Created by kevin-ee on 2019-02-01.
  */
 
-class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
+class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPickerDialog.Listener {
 
     private data class ValidityCheckResult(val isOk: Boolean, val errorMessage: String?)
 
     companion object {
         private const val KEY_TASK = "key.task"
         private const val KEY_THUMBNAIL_COLOR = "key.thumbnail.color"
+
+        private const val TAG_COLOR_PICKER = "ColorPicker"
+        private const val TAG_TASK_DESC_PICKER = "TaskDescPicker"
 
         fun newInstance(task: Task? = null): TaskEditorDialog {
             val instance = TaskEditorDialog()
@@ -70,6 +74,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
         toTimePicker = view.findViewById(R.id.end_timepicker)
         taskText = view.findViewById(R.id.task_input)
         thumbnail = view.findViewById(R.id.thumbnail)
+        val copyButton: Button = view.findViewById(R.id.copy_from_previous_tasks)
         val cancelButton: Button = view.findViewById(R.id.cancel_button)
         val deleteButton: Button = view.findViewById(R.id.delete_button)
         val okButton: Button = view.findViewById(R.id.ok_button)
@@ -86,7 +91,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
         startTimeDescView.text = startTimeDesc
         endTimeDescView.text = endTimeDesc
 
-        (fragmentManager.findFragmentByTag("ColorPicker") as? ColorPickerDialog)
+        (fragmentManager.findFragmentByTag(TAG_COLOR_PICKER) as? ColorPickerDialog)
             ?.setColorPickerDialogListener(this)
 
         thumbnail.setOnClickListener { _ ->
@@ -96,7 +101,15 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
                 .setShowAlphaSlider(true)
                 .create()
                 .apply { setColorPickerDialogListener(this@TaskEditorDialog) }
-                .show(fragmentManager, "ColorPicker")
+                .show(fragmentManager, TAG_COLOR_PICKER)
+        }
+
+        (fragmentManager.findFragmentByTag(TAG_TASK_DESC_PICKER) as? TaskDescPickerDialog)
+            ?.setListener(this)
+
+        copyButton.setOnClickListener { _ ->
+            TaskDescPickerDialog().apply { setListener(this@TaskEditorDialog) }
+                .show(fragmentManager.beginTransaction(), TAG_TASK_DESC_PICKER)
         }
 
         cancelButton.setOnClickListener { _ ->
@@ -132,7 +145,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
         if (originalTask != null) {
             fillViewsWithTask(originalTask!!)
         } else {
-            taskFragViewModel.getTasks().value.lastOrNull()?.also { lastTask ->
+            taskFragViewModel.getCurrentTasks().value.lastOrNull()?.also { lastTask ->
                 fromTimePicker.showTime(lastTask.toTime)
                 toTimePicker.showTime(lastTask.toTime)
             }
@@ -201,6 +214,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener {
         } else {
             (thumbnail.drawable.mutate() as ColorDrawable).color = color
         }
+    }
+
+    override fun onTaskDescPicked(taskDescription: TaskDescription) {
+        taskText.setText(taskDescription.desc)
+        updateThumbnailColor(taskDescription.colorInt, taskFragViewModel.defaultTaskColor)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

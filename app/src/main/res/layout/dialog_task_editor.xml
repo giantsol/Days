@@ -135,6 +135,13 @@
 
         </LinearLayout>
 
+        <Button
+            android:id="@+id/copy_from_previous_tasks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="copy"
+            />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

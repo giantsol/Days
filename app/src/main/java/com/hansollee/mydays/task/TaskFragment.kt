@@ -65,7 +65,7 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
                 viewModel.loadTasksForDate(currentDate)
             })
 
-            it.getTasks().observe(this, Observer<List<Task>> { tasks ->
+            it.getCurrentTasks().observe(this, Observer<List<Task>> { tasks ->
                 taskListAdapter.setTasks(tasks)
 
                 historyFragviewModel.onTasksUpdated(it.getCurrentDate().value, tasks)

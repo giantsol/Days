@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.hansollee.mydays.models.Task
+import com.hansollee.mydays.models.TaskDescription
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -18,6 +19,9 @@ import org.threeten.bp.LocalDate
 
 @Dao
 interface TaskDao {
+    @Query("SELECT DISTINCT task_description, color_int FROM tasks")
+    fun getAllTaskDescriptions(): Observable<List<TaskDescription>>
+
     @Query("SELECT * FROM tasks WHERE date LIKE :date ORDER BY from_time ASC, to_time ASC")
     fun getTasksByDate(date: LocalDate): Observable<List<Task>>
 

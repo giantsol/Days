@@ -9,6 +9,7 @@ import com.hansollee.mydays.appContext
 import com.hansollee.mydays.db.AppDatabase
 import com.hansollee.mydays.db.TaskDao
 import com.hansollee.mydays.models.Task
+import com.hansollee.mydays.models.TaskDescription
 import com.hansollee.mydays.today
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -21,10 +22,12 @@ import org.threeten.bp.LocalDate
 
 class TaskFragmentViewModel: ViewModel() {
     private val currentDateLiveData: MutableLiveData<LocalDate> = MutableLiveData()
-    private lateinit var tasksLiveData: MutableLiveData<List<Task>>
+    private lateinit var currentTasksLiveData: MutableLiveData<List<Task>>
     private val isLoadingLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    private lateinit var allTaskDescriptions: MutableLiveData<List<TaskDescription>>
 
     private var getTasksDisposable: Disposable? = null
+    private var allTaskDescriptionsDisposable: Disposable? = null
 
     private val taskDao: TaskDao = AppDatabase.getInstance().taskDao()
 
@@ -73,13 +76,13 @@ class TaskFragmentViewModel: ViewModel() {
             }
     }
 
-    fun getTasks(): LiveData<List<Task>> {
-        if (!::tasksLiveData.isInitialized) {
-            tasksLiveData = MutableLiveData()
+    fun getCurrentTasks(): LiveData<List<Task>> {
+        if (!::currentTasksLiveData.isInitialized) {
+            currentTasksLiveData = MutableLiveData()
             loadTasksForDate(getCurrentDate().value)
         }
 
-        return tasksLiveData
+        return currentTasksLiveData
     }
 
     fun loadTasksForDate(date: LocalDate) {
@@ -93,7 +96,7 @@ class TaskFragmentViewModel: ViewModel() {
                 isLoadingLiveData.value = false
             }
             .subscribe { tasks ->
-                tasksLiveData.value = tasks
+                currentTasksLiveData.value = tasks
                 isLoadingLiveData.value = false
             }
     }
@@ -102,7 +105,26 @@ class TaskFragmentViewModel: ViewModel() {
         return isLoadingLiveData
     }
 
+    fun getAllTaskDescriptions(): LiveData<List<TaskDescription>> {
+        if (!::allTaskDescriptions.isInitialized) {
+            allTaskDescriptions = MutableLiveData()
+            loadAllTasks()
+        }
+
+        return allTaskDescriptions
+    }
+
+    private fun loadAllTasks() {
+        allTaskDescriptionsDisposable?.dispose()
+        allTaskDescriptionsDisposable = taskDao.getAllTaskDescriptions()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ tasks ->
+                allTaskDescriptions.value = tasks
+            })
+    }
+
     override fun onCleared() {
         getTasksDisposable?.dispose()
+        allTaskDescriptionsDisposable?.dispose()
     }
 }
