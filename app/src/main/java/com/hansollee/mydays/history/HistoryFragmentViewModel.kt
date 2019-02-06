@@ -46,7 +46,7 @@ class HistoryFragmentViewModel: ViewModel() {
             return
         }
 
-        getHistoryItemsDisposable = taskDao.getTasksBetweenDates(startDate, endDate)
+        getHistoryItemsDisposable = taskDao.getTasksBetweenDatesSingle(startDate, endDate)
             .map { tasks ->
                 tasks
                     .groupBy { it.date }
@@ -62,6 +62,15 @@ class HistoryFragmentViewModel: ViewModel() {
             }, { error ->
                 toast(error.message)
             })
+    }
+
+    fun onTasksUpdated(date: LocalDate, tasks: List<Task>) {
+        val history = History(date, tasks)
+        val indexToUpdate = allHistoryItems.binarySearch(history, compareByDescending(History::date))
+        if (indexToUpdate >= 0 && indexToUpdate < allHistoryItems.size) {
+            allHistoryItems[indexToUpdate] = history
+            allHistoryItemsLiveData.value = allHistoryItems
+        }
     }
 
     override fun onCleared() {

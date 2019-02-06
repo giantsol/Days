@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hansollee.mydays.R
+import com.hansollee.mydays.history.HistoryFragmentViewModel
 import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.toStringFormat
 import org.threeten.bp.LocalDate
@@ -28,6 +29,7 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val viewModel = ViewModelProviders.of(activity).get(TaskFragmentViewModel::class.java)
+        val historyFragviewModel = ViewModelProviders.of(activity).get(HistoryFragmentViewModel::class.java)
         val floatingButton: FloatingActionButton = view.findViewById(R.id.floating_button)
         val arrowBack: View = view.findViewById(R.id.arrow_back)
         val arrowForward: View = view.findViewById(R.id.arrow_forward)
@@ -65,6 +67,8 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
 
             it.getTasks().observe(this, Observer<List<Task>> { tasks ->
                 taskListAdapter.setTasks(tasks)
+
+                historyFragviewModel.onTasksUpdated(it.getCurrentDate().value, tasks)
             })
 
             it.getLoadingStatus().observe(this, Observer<Boolean> { isLoading ->

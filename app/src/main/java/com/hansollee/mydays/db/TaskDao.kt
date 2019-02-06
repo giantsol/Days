@@ -22,7 +22,7 @@ interface TaskDao {
     fun getTasksByDate(date: LocalDate): Observable<List<Task>>
 
     @Query("SELECT * FROM tasks WHERE date BETWEEN :from AND :to")
-    fun getTasksBetweenDates(from: LocalDate, to: LocalDate): Single<List<Task>>
+    fun getTasksBetweenDatesSingle(from: LocalDate, to: LocalDate): Single<List<Task>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTask(task: Task): Completable
