@@ -74,10 +74,8 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
             it.getLoadingStatus().observe(this, Observer<Boolean> { isLoading ->
                 if (isLoading) {
                     progressView.visibility = View.VISIBLE
-                    taskList.visibility = View.GONE
                 } else {
                     progressView.visibility = View.GONE
-                    taskList.visibility = View.VISIBLE
                 }
             })
         }
