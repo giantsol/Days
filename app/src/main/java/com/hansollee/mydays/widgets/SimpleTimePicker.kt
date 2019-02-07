@@ -5,12 +5,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.NumberPicker
 import com.hansollee.mydays.R
 import org.threeten.bp.LocalTime
+import org.threeten.bp.jdk8.Jdk8Methods
 import java.util.Locale
 
 /**
@@ -21,7 +21,7 @@ import java.util.Locale
 // 그 외의 특별한 기능은 없음.
 class SimpleTimePicker
 @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-    : LinearLayout(context, attrs, defStyleAttr) {
+    : LinearLayout(context, attrs, defStyleAttr), Comparable<SimpleTimePicker> {
 
     private class TwoDigitFormatter internal constructor() : NumberPicker.Formatter {
         internal val mBuilder = StringBuilder()
@@ -61,6 +61,10 @@ class SimpleTimePicker
         }
     }
 
+    interface OnTimeChangedListener {
+        fun onTimeChanged(hourOfDay: Int, minute: Int)
+    }
+
     companion object {
         private const val MIN_HOUR = 0
         private const val MAX_HOUR = 11
@@ -82,11 +86,16 @@ class SimpleTimePicker
     private val minutePicker: NumberPicker
     private val amPmPicker: NumberPicker
 
-    private val hourIn24Format: Int
+    val hourOfDay: Int
         get() = if (isAm()) hourPicker.value else hourPicker.value + 12
+    val minute: Int
+        get() = minutePicker.value
 
+    // 이 변수에 자주 접근하는건 안좋음. 매번 새로운 객체를 만들기 때문
     val time: LocalTime
-        get() = LocalTime.of(hourIn24Format, minutePicker.value)
+        get() = LocalTime.of(hourOfDay, minutePicker.value)
+
+    var listener: OnTimeChangedListener? = null
 
     init {
         orientation = LinearLayout.HORIZONTAL
@@ -112,6 +121,8 @@ class SimpleTimePicker
                     (oldVal == MIN_HOUR && newVal == MAX_HOUR)) {
                     invertAmPm()
                 }
+
+                notifyTimeChanged()
             }
         }
 
@@ -138,6 +149,8 @@ class SimpleTimePicker
                     }
                     hourPicker.value = newHour
                 }
+
+                notifyTimeChanged()
             }
         }
 
@@ -148,6 +161,8 @@ class SimpleTimePicker
             it.setOnValueChangedListener { picker, oldVal, newVal ->
                 picker.requestFocus()
                 hideKeyboardIfShown()
+
+                notifyTimeChanged()
             }
         }
     }
@@ -165,9 +180,36 @@ class SimpleTimePicker
     }
 
     // 파라미터로 받은 time 값을 picker들에 보여줌
-    fun showTime(time: LocalTime) {
+    fun setTime(time: LocalTime) {
         hourPicker.value = time.hour % 12
         minutePicker.value = time.minute
         amPmPicker.value = if (time.hour < 12) AM else PM
+
+        notifyTimeChanged()
+    }
+
+    fun setTime(hourOfDay: Int, minute: Int) {
+        hourPicker.value = hourOfDay % 12
+        minutePicker.value = minute
+        amPmPicker.value = if (hourOfDay < 12) AM else PM
+
+        notifyTimeChanged()
+    }
+
+    fun setOnTimeChangedListener(listener: OnTimeChangedListener) {
+        this.listener = listener
+    }
+
+    private fun notifyTimeChanged() {
+        listener?.onTimeChanged(hourOfDay, minute)
+    }
+
+    override fun compareTo(other: SimpleTimePicker): Int {
+        var cmp = Jdk8Methods.compareInts(hourOfDay, other.hourOfDay)
+        if (cmp == 0) {
+            cmp = Jdk8Methods.compareInts(minute, other.minute)
+        }
+
+        return cmp
     }
 }

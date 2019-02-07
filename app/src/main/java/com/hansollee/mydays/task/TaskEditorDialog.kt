@@ -1,10 +1,12 @@
 package com.hansollee.mydays.task
 
+import android.app.Activity
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -60,6 +62,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
     private val currentThumbnailColor: Int
         get() = (thumbnail.drawable as ColorDrawable).color
 
+    private lateinit var inputMethodManager: InputMethodManager
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
@@ -79,6 +83,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         val deleteButton: Button = view.findViewById(R.id.delete_button)
         val okButton: Button = view.findViewById(R.id.ok_button)
 
+        inputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+
         val res = context.resources
         fromToInvalidMsg = res.getString(R.string.from_and_to_invalid)
         taskDescriptionInvalidMsg = res.getString(R.string.task_description_invalid)
@@ -91,10 +97,20 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         startTimeDescView.text = startTimeDesc
         endTimeDescView.text = endTimeDesc
 
+        fromTimePicker.setOnTimeChangedListener(object: SimpleTimePicker.OnTimeChangedListener {
+            override fun onTimeChanged(hourOfDay: Int, minute: Int) {
+                if (toTimePicker < fromTimePicker) {
+                    toTimePicker.setTime(hourOfDay, minute)
+                }
+            }
+        })
+
         (fragmentManager.findFragmentByTag(TAG_COLOR_PICKER) as? ColorPickerDialog)
             ?.setColorPickerDialogListener(this)
 
         thumbnail.setOnClickListener { _ ->
+            hideKeyboardIfShown()
+
             ColorPickerDialog.newBuilder()
                 .setColor(currentThumbnailColor)
                 .setDialogType(ColorPickerDialog.TYPE_CUSTOM)
@@ -146,8 +162,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
             fillViewsWithTask(originalTask!!)
         } else {
             taskFragViewModel.getCurrentTasks().value.lastOrNull()?.also { lastTask ->
-                fromTimePicker.showTime(lastTask.toTime)
-                toTimePicker.showTime(lastTask.toTime)
+                fromTimePicker.setTime(lastTask.toTime)
+                toTimePicker.setTime(lastTask.toTime)
             }
         }
 
@@ -185,8 +201,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         val fromTime = task.fromTime
         val toTime = task.toTime
 
-        fromTimePicker.showTime(fromTime)
-        toTimePicker.showTime(toTime)
+        fromTimePicker.setTime(fromTime)
+        toTimePicker.setTime(toTime)
 
         taskText.setText(task.desc)
         updateThumbnailColor(task.colorInt, taskFragViewModel.defaultTaskColor)
@@ -219,6 +235,12 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
     override fun onTaskDescPicked(taskDescription: TaskDescription) {
         taskText.setText(taskDescription.desc)
         updateThumbnailColor(taskDescription.colorInt, taskFragViewModel.defaultTaskColor)
+    }
+
+    private fun hideKeyboardIfShown() {
+        if (inputMethodManager.isActive) {
+            inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
