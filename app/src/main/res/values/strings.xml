@@ -24,4 +24,8 @@
     <string name="start_time_desc_first_touched">Start Time set to current time</string>
 
     <string name="pick_previous_task_title">Pick from Previous Tasks</string>
+
+    <string name="task_empty">No tasks done, yet!\nTry adding what you've done!</string>
+    <string name="history_empty">No history, yet!</string>
+    <string name="task_picker_empty">No previous tasks.</string>
 </resources>

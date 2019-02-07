@@ -37,6 +37,7 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
         val taskList: RecyclerView = view.findViewById(R.id.task_list)
         val taskListAdapter = TaskListAdapter(context, viewModel, this)
         val progressView: View = view.findViewById(R.id.progress_bar)
+        val emptyView: View = view.findViewById(R.id.empty_view)
 
         floatingButton.setOnClickListener { _ ->
             showTaskEditorDialog()
@@ -66,11 +67,22 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
             })
 
             it.getCurrentTasks().observe(this, Observer<TaskFragmentViewModel.TasksResult> { tasksResult ->
-                taskListAdapter.setTasks(tasksResult.tasks)
+                val tasks = tasksResult.tasks
+
+                if (tasks.isEmpty()) {
+                    emptyView.visibility = View.VISIBLE
+                    taskList.visibility = View.GONE
+                } else {
+                    emptyView.visibility = View.GONE
+                    taskList.visibility = View.VISIBLE
+                }
+
+                taskListAdapter.setTasks(tasks)
 
                 if (tasksResult.byUpdate) {
-                    historyFragviewModel.onTasksUpdated(it.getCurrentDate().value, tasksResult.tasks)
+                    historyFragviewModel.onTasksUpdated(it.getCurrentDate().value, tasks)
                 }
+
             })
 
             it.getLoadingStatus().observe(this, Observer<Boolean> { isLoading ->

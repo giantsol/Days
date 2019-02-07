@@ -30,12 +30,22 @@ class TaskDescPickerDialog : DialogFragment(), TaskDescListAdapter.ItemClickList
         val loadingView: View = view.findViewById(R.id.loading_view)
         val taskDescList: RecyclerView = view.findViewById(R.id.task_desc_list)
         val taskDescListAdapter = TaskDescListAdapter(context, taskFragViewModel, this)
+        val emptyView: View = view.findViewById(R.id.empty_view)
+
         taskDescList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         taskDescList.adapter = taskDescListAdapter
 
         taskFragViewModel.getAllTaskDescriptions().observe(this, Observer<List<TaskDescription>> { taskDescs ->
             loadingView.visibility = View.GONE
-            taskDescList.visibility = View.VISIBLE
+
+            if (taskDescs.isEmpty()) {
+                emptyView.visibility = View.VISIBLE
+                taskDescList.visibility = View.GONE
+            } else {
+                emptyView.visibility = View.GONE
+                taskDescList.visibility = View.VISIBLE
+            }
+
             taskDescListAdapter.setItems(taskDescs)
         })
 

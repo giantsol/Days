@@ -26,11 +26,20 @@ class HistoryFragment : Fragment(), HistoryListAdapter.HistoryItemClickListener 
         val viewModel = ViewModelProviders.of(activity).get(HistoryFragmentViewModel::class.java)
         val historyList: RecyclerView = view.findViewById(R.id.history_list)
         val historyListAdapter = HistoryListAdapter(context, viewModel, this)
+        val emptyView: View = view.findViewById(R.id.empty_view)
 
         historyList.layoutManager = LinearLayoutManager(context)
         historyList.adapter = historyListAdapter
 
         viewModel.getAllHistoryItems().observe(this, Observer<List<History>> { items ->
+            if (items.isEmpty()) {
+                emptyView.visibility = View.VISIBLE
+                historyList.visibility = View.GONE
+            } else {
+                emptyView.visibility = View.GONE
+                historyList.visibility = View.VISIBLE
+            }
+
             historyListAdapter.updateHistoryItems(items)
         })
     }
