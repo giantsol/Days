@@ -21,8 +21,11 @@ import org.threeten.bp.LocalDate
  */
 
 class TaskFragmentViewModel: ViewModel() {
+
+    data class TasksResult(val tasks: List<Task>, val byUpdate: Boolean)
+
     private val currentDateLiveData: MutableLiveData<LocalDate> = MutableLiveData()
-    private lateinit var currentTasksLiveData: MutableLiveData<List<Task>>
+    private lateinit var currentTasksLiveData: MutableLiveData<TasksResult>
     private val isLoadingLiveData: MutableLiveData<Boolean> = MutableLiveData()
     private lateinit var allTaskDescriptions: MutableLiveData<List<TaskDescription>>
 
@@ -32,6 +35,8 @@ class TaskFragmentViewModel: ViewModel() {
     private val taskDao: TaskDao = AppDatabase.getInstance().taskDao()
 
     val defaultTaskColor = ContextCompat.getColor(appContext, R.color.grey)
+
+    private var updatingDate: LocalDate? = null
 
     init {
         currentDateLiveData.value = today
@@ -57,6 +62,7 @@ class TaskFragmentViewModel: ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 isLoadingLiveData.value = true
+                updatingDate = task.date
             }
     }
 
@@ -65,6 +71,7 @@ class TaskFragmentViewModel: ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 isLoadingLiveData.value = true
+                updatingDate = task.date
             }
     }
 
@@ -73,10 +80,11 @@ class TaskFragmentViewModel: ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 isLoadingLiveData.value = true
+                updatingDate = task.date
             }
     }
 
-    fun getCurrentTasks(): LiveData<List<Task>> {
+    fun getCurrentTasks(): LiveData<TasksResult> {
         if (!::currentTasksLiveData.isInitialized) {
             currentTasksLiveData = MutableLiveData()
             loadTasksForDate(getCurrentDate().value)
@@ -96,8 +104,9 @@ class TaskFragmentViewModel: ViewModel() {
                 isLoadingLiveData.value = false
             }
             .subscribe { tasks ->
-                currentTasksLiveData.value = tasks
+                currentTasksLiveData.value = TasksResult(tasks, updatingDate == date)
                 isLoadingLiveData.value = false
+                updatingDate = null
             }
     }
 

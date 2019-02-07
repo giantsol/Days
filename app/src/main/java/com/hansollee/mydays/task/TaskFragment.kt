@@ -65,10 +65,12 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
                 viewModel.loadTasksForDate(currentDate)
             })
 
-            it.getCurrentTasks().observe(this, Observer<List<Task>> { tasks ->
-                taskListAdapter.setTasks(tasks)
+            it.getCurrentTasks().observe(this, Observer<TaskFragmentViewModel.TasksResult> { tasksResult ->
+                taskListAdapter.setTasks(tasksResult.tasks)
 
-                historyFragviewModel.onTasksUpdated(it.getCurrentDate().value, tasks)
+                if (tasksResult.byUpdate) {
+                    historyFragviewModel.onTasksUpdated(it.getCurrentDate().value, tasksResult.tasks)
+                }
             })
 
             it.getLoadingStatus().observe(this, Observer<Boolean> { isLoading ->

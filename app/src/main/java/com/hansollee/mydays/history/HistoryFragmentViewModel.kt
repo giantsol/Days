@@ -68,8 +68,18 @@ class HistoryFragmentViewModel: ViewModel() {
         val history = History(date, tasks)
         val indexToUpdate = allHistoryItems.binarySearch(history, compareByDescending(History::date))
         if (indexToUpdate >= 0 && indexToUpdate < allHistoryItems.size) {
-            allHistoryItems[indexToUpdate] = history
+            if (history.tasks.isEmpty()) {
+                allHistoryItems.removeAt(indexToUpdate)
+            } else {
+                allHistoryItems[indexToUpdate] = history
+            }
             allHistoryItemsLiveData.value = allHistoryItems
+        } else if (history.tasks.isNotEmpty()) {
+            val indexToInsert = -indexToUpdate - 1
+            if (indexToInsert >= 0 && indexToInsert <= allHistoryItems.size) {
+                allHistoryItems.add(indexToInsert, history)
+                allHistoryItemsLiveData.value = allHistoryItems
+            }
         }
     }
 

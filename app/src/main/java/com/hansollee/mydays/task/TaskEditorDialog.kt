@@ -199,7 +199,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         if (originalTask != null) {
             fillViewsWithTask(originalTask!!)
         } else {
-            taskFragViewModel.getCurrentTasks().value.lastOrNull()?.also { lastTask ->
+            taskFragViewModel.getCurrentTasks().value.tasks.lastOrNull()?.also { lastTask ->
                 startTimePicker.setTime(lastTask.endTime)
                 endTimePicker.setTime(lastTask.endTime)
             }
