@@ -1,18 +1,27 @@
 package com.hansollee.mydays.task
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.DialogInterface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
+import com.hansollee.mydays.AppSharedPrefs
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.models.TaskDescription
@@ -20,6 +29,11 @@ import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.SimpleTimePicker
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import org.threeten.bp.LocalTime
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by kevin-ee on 2019-02-01.
@@ -48,12 +62,12 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
     }
 
     private lateinit var taskFragViewModel: TaskFragmentViewModel
-    private lateinit var fromTimePicker: SimpleTimePicker
-    private lateinit var toTimePicker: SimpleTimePicker
+    private lateinit var startTimePicker: SimpleTimePicker
+    private lateinit var endTimePicker: SimpleTimePicker
     private lateinit var taskText: EditText
     private lateinit var thumbnail: ImageView
 
-    // task를 클릭해서 열렸으면 Nonnull, 새로만들기 버튼을 클릭해서 열렸으면 null
+    // task를 클릭해서 열렸으면 nonnull, 새로만들기 버튼을 클릭해서 열렸으면 null
     private var originalTask: Task? = null
 
     private lateinit var fromToInvalidMsg: String
@@ -63,6 +77,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         get() = (thumbnail.drawable as ColorDrawable).color
 
     private lateinit var inputMethodManager: InputMethodManager
+
+    private var startTimeDescTouchHinter: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -74,8 +90,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         val title: TextView = view.findViewById(R.id.title)
         val startTimeDescView: TextView = view.findViewById(R.id.start_time_desc)
         val endTimeDescView: TextView = view.findViewById(R.id.end_time_desc)
-        fromTimePicker = view.findViewById(R.id.start_timepicker)
-        toTimePicker = view.findViewById(R.id.end_timepicker)
+        startTimePicker = view.findViewById(R.id.start_timepicker)
+        endTimePicker = view.findViewById(R.id.end_timepicker)
         taskText = view.findViewById(R.id.task_input)
         thumbnail = view.findViewById(R.id.thumbnail)
         val copyButton: Button = view.findViewById(R.id.copy_from_previous_tasks)
@@ -97,10 +113,30 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         startTimeDescView.text = startTimeDesc
         endTimeDescView.text = endTimeDesc
 
-        fromTimePicker.setOnTimeChangedListener(object: SimpleTimePicker.OnTimeChangedListener {
+        startTimeDescView.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN && !AppSharedPrefs.getInstance().hasUserTouchedStartTimeDesc()) {
+                startTimeDescTouchHinter?.dispose()
+                AppSharedPrefs.getInstance().setHasUserTouchedStartTimeDesc(true)
+
+                val toastMsg = res.getString(R.string.start_time_desc_first_touched)
+                toast(toastMsg)
+            }
+
+            false
+        }
+
+        startTimeDescView.setOnClickListener { _ ->
+            startTimePicker.setTime(LocalTime.now())
+        }
+
+        endTimeDescView.setOnClickListener { _ ->
+            endTimePicker.setTime(LocalTime.now())
+        }
+
+        startTimePicker.setOnTimeChangedListener(object: SimpleTimePicker.OnTimeChangedListener {
             override fun onTimeChanged(hourOfDay: Int, minute: Int) {
-                if (toTimePicker < fromTimePicker) {
-                    toTimePicker.setTime(hourOfDay, minute)
+                if (endTimePicker < startTimePicker) {
+                    endTimePicker.setTime(hourOfDay, minute)
                 }
             }
         })
@@ -124,6 +160,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
             ?.setListener(this)
 
         copyButton.setOnClickListener { _ ->
+            hideKeyboardIfShown()
+
             TaskDescPickerDialog().apply { setListener(this@TaskEditorDialog) }
                 .show(fragmentManager.beginTransaction(), TAG_TASK_DESC_PICKER)
         }
@@ -162,8 +200,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
             fillViewsWithTask(originalTask!!)
         } else {
             taskFragViewModel.getCurrentTasks().value.lastOrNull()?.also { lastTask ->
-                fromTimePicker.setTime(lastTask.toTime)
-                toTimePicker.setTime(lastTask.toTime)
+                startTimePicker.setTime(lastTask.endTime)
+                endTimePicker.setTime(lastTask.endTime)
             }
         }
 
@@ -171,13 +209,46 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
             updateThumbnailColor(savedInstanceState.getInt(KEY_THUMBNAIL_COLOR), taskFragViewModel.defaultTaskColor)
         }
 
+        if (!AppSharedPrefs.getInstance().hasUserTouchedStartTimeDesc()) {
+            startTimeDescTouchHinter = beginTouchHinter(startTimeDescView)
+        }
+
         return view
     }
 
+    private fun beginTouchHinter(view: View): Disposable {
+        val unselectedButtonColor = ContextCompat.getColor(context, android.R.color.transparent)
+        val selectedButtonColor = ContextCompat.getColor(context, R.color.button_selected)
+        val argbEvaluator = ArgbEvaluator()
+
+        val hintAnimator = ValueAnimator().apply {
+            duration = 400
+            setFloatValues(0f, 1f)
+            interpolator = LinearInterpolator()
+            addUpdateListener {
+                view.setBackgroundColor(argbEvaluator.evaluate(it.animatedValue as Float, unselectedButtonColor, selectedButtonColor) as Int)
+            }
+            addListener(object: AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    view.setBackgroundResource(R.drawable.button_background)
+                }
+            })
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = 1
+        }
+
+        return Observable.intervalRange(0, 3, 500, 1500, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally { hintAnimator.cancel() }
+            .subscribe { _ ->
+                hintAnimator.start()
+            }
+    }
+
     private fun getValidityCheckResult(): ValidityCheckResult {
-        val fromTime = fromTimePicker.time
-        val toTime = toTimePicker.time
-        if (fromTime > toTime) {
+        val startTime = startTimePicker.time
+        val endTime = endTimePicker.time
+        if (startTime > endTime) {
             return ValidityCheckResult(false, fromToInvalidMsg)
         }
 
@@ -190,7 +261,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
 
     private fun createNewTaskFromInputs(): Task {
         val date = originalTask?.date ?: taskFragViewModel.getCurrentDate().value
-        return Task(date, fromTimePicker.time, toTimePicker.time, taskText.text.toString(),
+        return Task(date, startTimePicker.time, endTimePicker.time, taskText.text.toString(),
             (thumbnail.drawable as ColorDrawable).color)
     }
 
@@ -198,11 +269,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         = createNewTaskFromInputs().also { it.id = originalTask.id }
 
     private fun fillViewsWithTask(task: Task) {
-        val fromTime = task.fromTime
-        val toTime = task.toTime
+        val startTime = task.startTime
+        val endTime = task.endTime
 
-        fromTimePicker.setTime(fromTime)
-        toTimePicker.setTime(toTime)
+        startTimePicker.setTime(startTime)
+        endTimePicker.setTime(endTime)
 
         taskText.setText(task.desc)
         updateThumbnailColor(task.colorInt, taskFragViewModel.defaultTaskColor)
@@ -246,5 +317,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(KEY_THUMBNAIL_COLOR, currentThumbnailColor)
+    }
+
+    override fun onDismiss(dialog: DialogInterface?) {
+        super.onDismiss(dialog)
+
+        startTimeDescTouchHinter?.dispose()
     }
 }

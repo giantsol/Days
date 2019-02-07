@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#0076bf</color>
     <color name="colorAccent">#ff5722</color>
 
-    <color name="button_unselected">#FFFFFF</color>
+    <color name="button_unselected">#FFFFFFFF</color>
     <color name="button_selected">#1F000000</color>
 
     <color name="grey">#89000000</color>

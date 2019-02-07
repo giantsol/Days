@@ -18,4 +18,6 @@
 
     <string name="start_time_desc">Start Time</string>
     <string name="end_time_desc">End Time</string>
+
+    <string name="start_time_desc_first_touched">Start Time set to current time</string>
 </resources>

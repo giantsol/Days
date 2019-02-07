@@ -66,7 +66,7 @@ class TaskListAdapter(context: Context,
             }
 
             timeRange.text = String.format(TIME_RANGE_FORMAT,
-                task.fromTime.toStringFormat(), task.toTime.toStringFormat())
+                task.startTime.toStringFormat(), task.endTime.toStringFormat())
             taskDescription.text = task.desc
 
             contentContainer.setOnClickListener { _ ->

@@ -50,7 +50,7 @@ class HistoryFragmentViewModel: ViewModel() {
             .map { tasks ->
                 tasks
                     .groupBy { it.date }
-                    .map { History(it.key, it.value.sortedWith(compareBy(Task::fromTime, Task::toTime))) }
+                    .map { History(it.key, it.value.sortedWith(compareBy(Task::startTime, Task::endTime))) }
                     .sortedByDescending { it.date }
             }
             .subscribeOn(Schedulers.io())

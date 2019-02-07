@@ -77,8 +77,8 @@ class HistoryGraphView
 
             for (task in tasks) {
                 paint.color = task.colorInt
-                graphRect.left = task.fromTime.toMinuteOfDay() * distancePerMinute
-                graphRect.right = task.toTime.toMinuteOfDay() * distancePerMinute
+                graphRect.left = task.startTime.toMinuteOfDay() * distancePerMinute
+                graphRect.right = task.endTime.toMinuteOfDay() * distancePerMinute
                 canvas.drawRect(graphRect, paint)
             }
         }

@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
-            android:layout_marginBottom="@dimen/task_editor_dialog_header_bottom_margin"
+            android:layout_marginBottom="4dp"
             >
 
             <TextView
@@ -50,20 +50,24 @@
 
                 <TextView
                     android:id="@+id/start_time_desc"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/task_editor_dialog_time_desc_textsize"
                     android:textColor="@color/grey"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginStart="4dp"
+                    android:gravity="center"
+                    android:paddingLeft="4dp"
+                    android:paddingStart="4dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:background="@drawable/button_background"
+                    android:clickable="true"
                     />
 
                 <com.hansollee.mydays.widgets.SimpleTimePicker
                     android:id="@+id/start_timepicker"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/task_editor_dialog_timepicker_height"
-                    android:layout_marginTop="@dimen/task_editor_dialog_timepicker_top_margin"
+                    android:layout_marginTop="4dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="8dp"
                     />
@@ -79,20 +83,24 @@
 
                 <TextView
                     android:id="@+id/end_time_desc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:textSize="@dimen/task_editor_dialog_time_desc_textsize"
                     android:textColor="@color/grey"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginRight="4dp"
-                    android:layout_marginEnd="4dp"
+                    android:gravity="center"
+                    android:paddingRight="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:background="@drawable/button_background"
+                    android:clickable="true"
                     />
 
                 <com.hansollee.mydays.widgets.SimpleTimePicker
                     android:id="@+id/end_timepicker"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/task_editor_dialog_timepicker_height"
-                    android:layout_marginTop="@dimen/task_editor_dialog_timepicker_top_margin"
+                    android:layout_marginTop="4dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="16dp"
                     />
@@ -105,7 +113,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginLeft="@dimen/task_editor_dialog_task_desc_side_margin"
+            android:layout_marginLeft="12dp"
             android:layout_marginRight="@dimen/task_editor_dialog_task_desc_side_margin"
             android:layout_marginBottom="@dimen/task_editor_dialog_task_desc_bottom_margin"
             android:gravity="center_vertical"

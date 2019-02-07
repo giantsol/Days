@@ -16,8 +16,8 @@ import org.threeten.bp.LocalTime
 @Entity(tableName = "tasks",
     indices = arrayOf(Index(value = ["date"])))
 data class Task(@ColumnInfo(name = "date") val date: LocalDate,
-                @ColumnInfo(name = "from_time") val fromTime: LocalTime,
-                @ColumnInfo(name = "to_time") val toTime: LocalTime,
+                @ColumnInfo(name = "from_time") val startTime: LocalTime,
+                @ColumnInfo(name = "to_time") val endTime: LocalTime,
                 @ColumnInfo(name = "task_description") val desc: String,
                 @ColumnInfo(name = "color_int") val colorInt: Int) : Parcelable {
 
@@ -35,8 +35,8 @@ data class Task(@ColumnInfo(name = "date") val date: LocalDate,
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeSerializable(date)
-        dest.writeSerializable(fromTime)
-        dest.writeSerializable(toTime)
+        dest.writeSerializable(startTime)
+        dest.writeSerializable(endTime)
         dest.writeString(desc)
         dest.writeInt(colorInt)
         dest.writeLong(id)
