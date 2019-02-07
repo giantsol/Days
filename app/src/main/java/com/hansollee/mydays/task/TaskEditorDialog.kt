@@ -116,16 +116,18 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         startTimeDescView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN && !AppSharedPrefs.getInstance().hasUserTouchedStartTimeDesc()) {
                 startTimeDescTouchHinter?.dispose()
-                AppSharedPrefs.getInstance().setHasUserTouchedStartTimeDesc(true)
-
-                val toastMsg = res.getString(R.string.start_time_desc_first_touched)
-                toast(toastMsg)
             }
 
             false
         }
 
         startTimeDescView.setOnClickListener { _ ->
+            if (!AppSharedPrefs.getInstance().hasUserTouchedStartTimeDesc()) {
+                AppSharedPrefs.getInstance().setHasUserTouchedStartTimeDesc(true)
+                val toastMsg = res.getString(R.string.start_time_desc_first_touched)
+                toast(toastMsg)
+            }
+
             startTimePicker.setTime(LocalTime.now())
         }
 
