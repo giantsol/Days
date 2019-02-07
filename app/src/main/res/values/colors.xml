@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#019ae8</color>
+    <color name="colorPrimaryLight">#64cbff</color>
     <color name="colorPrimaryDark">#0076bf</color>
     <color name="colorAccent">#ff5722</color>
 
@@ -13,4 +14,6 @@
     <color name="tab_unselected">#B2FFFFFF</color>
 
     <color name="default_history_graph_color">#D8D8D8</color>
+
+    <color name="default_task_thumbnail_color">@color/colorPrimaryLight</color>
 </resources>

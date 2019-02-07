@@ -208,7 +208,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         }
 
         if (savedInstanceState != null) {
-            updateThumbnailColor(savedInstanceState.getInt(KEY_THUMBNAIL_COLOR), taskFragViewModel.defaultTaskColor)
+            updateThumbnailColor(savedInstanceState.getInt(KEY_THUMBNAIL_COLOR))
         }
 
         if (!AppSharedPrefs.getInstance().hasUserTouchedStartTimeDesc()) {
@@ -278,7 +278,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         endTimePicker.setTime(endTime)
 
         taskText.setText(task.desc)
-        updateThumbnailColor(task.colorInt, taskFragViewModel.defaultTaskColor)
+        updateThumbnailColor(task.colorInt)
     }
 
     override fun onStart() {
@@ -294,20 +294,16 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
     }
 
     override fun onColorSelected(dialogId: Int, color: Int) {
-        updateThumbnailColor(color, taskFragViewModel.defaultTaskColor)
+        updateThumbnailColor(color)
     }
 
-    private fun updateThumbnailColor(color: Int, defColor: Int) {
-        if (color == 0) {
-            (thumbnail.drawable.mutate() as ColorDrawable).color = defColor
-        } else {
-            (thumbnail.drawable.mutate() as ColorDrawable).color = color
-        }
+    private fun updateThumbnailColor(color: Int) {
+        (thumbnail.drawable.mutate() as ColorDrawable).color = color
     }
 
     override fun onTaskDescPicked(taskDescription: TaskDescription) {
         taskText.setText(taskDescription.desc)
-        updateThumbnailColor(taskDescription.colorInt, taskFragViewModel.defaultTaskColor)
+        updateThumbnailColor(taskDescription.colorInt)
     }
 
     private fun hideKeyboardIfShown() {

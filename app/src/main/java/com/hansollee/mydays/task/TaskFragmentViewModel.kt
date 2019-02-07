@@ -1,11 +1,8 @@
 package com.hansollee.mydays.task
 
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.hansollee.mydays.R
-import com.hansollee.mydays.appContext
 import com.hansollee.mydays.db.AppDatabase
 import com.hansollee.mydays.db.TaskDao
 import com.hansollee.mydays.models.Task
@@ -33,8 +30,6 @@ class TaskFragmentViewModel: ViewModel() {
     private var allTaskDescriptionsDisposable: Disposable? = null
 
     private val taskDao: TaskDao = AppDatabase.getInstance().taskDao()
-
-    val defaultTaskColor = ContextCompat.getColor(appContext, R.color.grey)
 
     private var updatingDate: LocalDate? = null
 

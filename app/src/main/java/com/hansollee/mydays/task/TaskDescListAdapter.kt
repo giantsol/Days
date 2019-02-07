@@ -54,11 +54,7 @@ class TaskDescListAdapter(context: Context,
         private val taskDescription: TextView = view.findViewById(R.id.task_description)
 
         fun bind(item: TaskDescription, itemClickListener: ItemClickListener, viewModel: TaskFragmentViewModel) {
-            if (item.colorInt == 0) {
-                (thumbnail.drawable.mutate() as ColorDrawable).color = viewModel.defaultTaskColor
-            } else {
-                (thumbnail.drawable.mutate() as ColorDrawable).color = item.colorInt
-            }
+            (thumbnail.drawable.mutate() as ColorDrawable).color = item.colorInt
 
             taskDescription.text = item.desc
 

@@ -59,11 +59,7 @@ class TaskListAdapter(context: Context,
         private val taskDescription: TextView = view.findViewById(R.id.task_description)
 
         fun bind(task: Task, itemClickListener: ItemClickListener, viewModel: TaskFragmentViewModel) {
-            if (task.colorInt == 0) {
-                (thumbnail.drawable.mutate() as ColorDrawable).color = viewModel.defaultTaskColor
-            } else {
-                (thumbnail.drawable.mutate() as ColorDrawable).color = task.colorInt
-            }
+            (thumbnail.drawable.mutate() as ColorDrawable).color = task.colorInt
 
             timeRange.text = String.format(TIME_RANGE_FORMAT,
                 task.startTime.toStringFormat(), task.endTime.toStringFormat())
