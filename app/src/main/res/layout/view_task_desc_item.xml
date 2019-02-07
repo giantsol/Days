@@ -18,6 +18,7 @@
         android:paddingBottom="12dp"
         android:clickable="true"
         android:background="@drawable/button_background"
+        android:gravity="center_vertical"
         >
 
         <com.hansollee.mydays.widgets.CircularImageView
@@ -35,7 +36,6 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/task_item_task_desc_textsize"
             android:textColor="@android:color/black"
-            android:layout_marginTop="@dimen/task_item_time_desc_spacing"
             android:layout_marginLeft="@dimen/task_item_content_margin_left"
             android:layout_marginStart="@dimen/task_item_content_margin_left"
             />

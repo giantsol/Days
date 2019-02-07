@@ -94,7 +94,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         endTimePicker = view.findViewById(R.id.end_timepicker)
         taskText = view.findViewById(R.id.task_input)
         thumbnail = view.findViewById(R.id.thumbnail)
-        val copyButton: Button = view.findViewById(R.id.copy_from_previous_tasks)
+        val previousTasksButton: View = view.findViewById(R.id.previous_tasks_button)
         val cancelButton: Button = view.findViewById(R.id.cancel_button)
         val deleteButton: Button = view.findViewById(R.id.delete_button)
         val okButton: Button = view.findViewById(R.id.ok_button)
@@ -159,7 +159,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         (fragmentManager.findFragmentByTag(TAG_TASK_DESC_PICKER) as? TaskDescPickerDialog)
             ?.setListener(this)
 
-        copyButton.setOnClickListener { _ ->
+        previousTasksButton.setOnClickListener { _ ->
             hideKeyboardIfShown()
 
             TaskDescPickerDialog().apply { setListener(this@TaskEditorDialog) }

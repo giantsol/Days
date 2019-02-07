@@ -44,8 +44,10 @@ class TaskDescPickerDialog : DialogFragment(), TaskDescListAdapter.ItemClickList
 
     override fun onStart() {
         super.onStart()
-
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.also {
+            it.window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            it.setCanceledOnTouchOutside(false)
+        }
     }
 
     fun setListener(listener: Listener) {

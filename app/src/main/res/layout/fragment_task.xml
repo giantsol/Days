@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_arrow_back_black_24dp"
-                android:padding="@dimen/spacing_very_very_very_big"
+                android:padding="16dp"
                 android:layout_gravity="center"
                 />
 
@@ -39,10 +39,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:textSize="@dimen/task_fragment_current_date_textsize"
+            android:textSize="16sp"
             android:background="@drawable/button_background"
             android:textColor="@color/grey"
             android:clickable="true"
+            android:maxLines="2"
+            android:ellipsize="end"
             />
 
         <FrameLayout
@@ -58,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_arrow_forward_black_24dp"
-                android:padding="@dimen/spacing_very_very_very_big"
+                android:padding="16dp"
                 android:layout_gravity="center"
                 />
 

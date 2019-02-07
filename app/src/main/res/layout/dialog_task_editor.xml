@@ -36,7 +36,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/task_editor_dialog_timepicker_bottom_margin"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal"
             android:weightSum="2"
             android:baselineAligned="false">
@@ -115,7 +115,6 @@
             android:orientation="horizontal"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="@dimen/task_editor_dialog_task_desc_side_margin"
-            android:layout_marginBottom="@dimen/task_editor_dialog_task_desc_bottom_margin"
             android:gravity="center_vertical"
             >
 
@@ -143,11 +142,18 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/copy_from_previous_tasks"
+        <TextView
+            android:id="@+id/previous_tasks_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="copy"
+            android:padding="4dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
+            android:textSize="14sp"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/button_previous_tasks"
+            android:background="@drawable/button_background"
+            android:clickable="true"
             />
 
         <LinearLayout
@@ -155,7 +161,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical|end"
-            android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:paddingRight="16dp"
             android:paddingEnd="16dp"
