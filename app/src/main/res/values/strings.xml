@@ -30,4 +30,6 @@
     <string name="task_picker_empty">No previous tasks.</string>
 
     <string name="text_proceeding">Proceeding</string>
+
+    <string name="press_again_to_quit">Press again to quit</string>
 </resources>

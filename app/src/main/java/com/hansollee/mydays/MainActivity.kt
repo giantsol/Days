@@ -4,9 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -17,9 +19,13 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
 
     companion object {
         private const val DRAWER_GRAVITY = Gravity.START
+        private const val SECOND_BACK_BUTTON_TO_QUIT_INTERVAL = 2000L
     }
 
     private val backKeyListeners: ArrayList<BackKeyListener> = ArrayList()
+    private lateinit var pressAgainToQuitMsg: String
+    private val handler = Handler()
+    private var isWaitingForSecondButtonToQuit = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +37,7 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         val menuButton: View = findViewById(R.id.menu_button)
         val drawer: DrawerLayout = findViewById(R.id.drawer)
         val miniMyDaysButton: View = findViewById(R.id.mini_mydays_button)
+        pressAgainToQuitMsg = getString(R.string.press_again_to_quit)
 
         viewPager.adapter = tabAdapter
         tabLayout.setupWithViewPager(viewPager)
@@ -91,7 +98,22 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
 
     override fun onBackPressed() {
         if (!dispatchBackKey()) {
-            super.onBackPressed()
+            if (isWaitingForSecondButtonToQuit) {
+                handler.removeCallbacks(resetWaitingForSecondButton)
+                super.onBackPressed()
+            } else {
+                beginWaitingForSecondBackButton()
+                toast(pressAgainToQuitMsg)
+            }
         }
+    }
+
+    private val resetWaitingForSecondButton = Runnable {
+        isWaitingForSecondButtonToQuit = false
+    }
+
+    private fun beginWaitingForSecondBackButton() {
+        isWaitingForSecondButtonToQuit = true
+        handler.postDelayed(resetWaitingForSecondButton, SECOND_BACK_BUTTON_TO_QUIT_INTERVAL)
     }
 }
