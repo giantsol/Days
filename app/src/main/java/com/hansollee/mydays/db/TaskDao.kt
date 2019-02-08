@@ -19,7 +19,8 @@ import org.threeten.bp.LocalDate
 
 @Dao
 interface TaskDao {
-    @Query("SELECT DISTINCT task_description, color_int FROM tasks")
+
+    @Query("SELECT task_description, color_int, COUNT(*) AS cnt FROM tasks GROUP BY task_description, color_int ORDER BY cnt desc")
     fun getAllTaskDescriptions(): Observable<List<TaskDescription>>
 
     @Query("SELECT * FROM tasks WHERE date LIKE :date ORDER BY from_time ASC, to_time ASC")
