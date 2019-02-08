@@ -15,7 +15,7 @@ class Converters {
     fun epochToDate(epoch: Long): LocalDate = LocalDate.ofEpochDay(epoch)
 
     @TypeConverter
-    fun timeToSeconds(localTime: LocalTime): Int = localTime.toSecondOfDay()
+    fun timeToSeconds(localTime: LocalTime?): Int? = localTime?.toSecondOfDay()
     @TypeConverter
-    fun secondsToTime(seconds: Int): LocalTime = LocalTime.ofSecondOfDay(seconds.toLong())
+    fun secondsToTime(seconds: Int?): LocalTime? = seconds?.let { LocalTime.ofSecondOfDay(seconds.toLong()) }
 }

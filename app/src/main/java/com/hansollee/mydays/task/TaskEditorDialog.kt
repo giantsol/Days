@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -80,6 +81,9 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
 
     private var startTimeDescTouchHinter: Disposable? = null
 
+    private lateinit var endTimeCheckbox: CheckBox
+    private lateinit var proceedingText: TextView
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
@@ -88,8 +92,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         val view = inflater.inflate(R.layout.dialog_task_editor, container, false)
         taskFragViewModel = ViewModelProviders.of(activity).get(TaskFragmentViewModel::class.java)
         val title: TextView = view.findViewById(R.id.title)
-        val startTimeDescView: TextView = view.findViewById(R.id.start_time_desc)
-        val endTimeDescView: TextView = view.findViewById(R.id.end_time_desc)
+        val startTimeTextView: TextView = view.findViewById(R.id.start_time_text)
+        val endTimeTextView: TextView = view.findViewById(R.id.end_time_text)
+        val endTimeTextContainer: View = view.findViewById(R.id.end_time_text_container)
+        endTimeCheckbox = view.findViewById(R.id.end_time_checkbox)
+        proceedingText = view.findViewById(R.id.text_proceeding)
         startTimePicker = view.findViewById(R.id.start_timepicker)
         endTimePicker = view.findViewById(R.id.end_timepicker)
         taskText = view.findViewById(R.id.task_input)
@@ -106,14 +113,10 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         taskDescriptionInvalidMsg = res.getString(R.string.task_description_invalid)
         val createNewTaskTitle = res.getString(R.string.create_new_task_title)
         val editTaskTitle = res.getString(R.string.edit_task_title)
-        val startTimeDesc = res.getString(R.string.start_time_desc)
-        val endTimeDesc = res.getString(R.string.end_time_desc)
 
         title.text = if (originalTask == null) createNewTaskTitle else editTaskTitle
-        startTimeDescView.text = startTimeDesc
-        endTimeDescView.text = endTimeDesc
 
-        startTimeDescView.setOnTouchListener { v, event ->
+        startTimeTextView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN && !AppSharedPrefs.getInstance().hasUserTouchedStartTimeDesc()) {
                 startTimeDescTouchHinter?.dispose()
             }
@@ -121,7 +124,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
             false
         }
 
-        startTimeDescView.setOnClickListener { _ ->
+        startTimeTextView.setOnClickListener { _ ->
             if (!AppSharedPrefs.getInstance().hasUserTouchedStartTimeDesc()) {
                 AppSharedPrefs.getInstance().setHasUserTouchedStartTimeDesc(true)
                 val toastMsg = res.getString(R.string.start_time_desc_first_touched)
@@ -131,13 +134,21 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
             startTimePicker.setTime(LocalTime.now())
         }
 
-        endTimeDescView.setOnClickListener { _ ->
-            endTimePicker.setTime(LocalTime.now())
+        endTimeTextContainer.setOnClickListener { _ ->
+            endTimeCheckbox.isChecked = !endTimeCheckbox.isChecked
+        }
+
+        endTimeCheckbox.setOnCheckedChangeListener { v, isChecked ->
+            toggleEndTimePickerVisibility(isChecked)
+
+            if (isChecked) {
+                endTimePicker.setTime(LocalTime.now())
+            }
         }
 
         startTimePicker.setOnTimeChangedListener(object: SimpleTimePicker.OnTimeChangedListener {
             override fun onTimeChanged(hourOfDay: Int, minute: Int) {
-                if (endTimePicker < startTimePicker) {
+                if (endTimePicker.visibility == View.VISIBLE && endTimePicker < startTimePicker) {
                     endTimePicker.setTime(hourOfDay, minute)
                 }
             }
@@ -201,10 +212,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         if (originalTask != null) {
             fillViewsWithTask(originalTask!!)
         } else {
-            taskFragViewModel.getCurrentTasks().value.tasks.lastOrNull()?.also { lastTask ->
-                startTimePicker.setTime(lastTask.endTime)
-                endTimePicker.setTime(lastTask.endTime)
-            }
+            startTimePicker.setTime(LocalTime.now())
         }
 
         if (savedInstanceState != null) {
@@ -212,10 +220,20 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         }
 
         if (!AppSharedPrefs.getInstance().hasUserTouchedStartTimeDesc()) {
-            startTimeDescTouchHinter = beginTouchHinter(startTimeDescView)
+            startTimeDescTouchHinter = beginTouchHinter(startTimeTextView)
         }
 
         return view
+    }
+
+    private fun toggleEndTimePickerVisibility(pickerVisible: Boolean) {
+        if (pickerVisible) {
+            endTimePicker.visibility = View.VISIBLE
+            proceedingText.visibility = View.GONE
+        } else {
+            endTimePicker.visibility = View.GONE
+            proceedingText.visibility = View.VISIBLE
+        }
     }
 
     private fun beginTouchHinter(view: View): Disposable {
@@ -249,8 +267,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
 
     private fun getValidityCheckResult(): ValidityCheckResult {
         val startTime = startTimePicker.time
-        val endTime = endTimePicker.time
-        if (startTime > endTime) {
+        val endTime = if (endTimePicker.visibility == View.VISIBLE) endTimePicker.time else null
+        if (endTime != null && startTime > endTime) {
             return ValidityCheckResult(false, fromToInvalidMsg)
         }
 
@@ -263,7 +281,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
 
     private fun createNewTaskFromInputs(): Task {
         val date = originalTask?.date ?: taskFragViewModel.getCurrentDate().value
-        return Task(date, startTimePicker.time, endTimePicker.time, taskText.text.toString(),
+        return Task(
+            date,
+            startTimePicker.time,
+            if (endTimePicker.visibility == View.VISIBLE) endTimePicker.time else null,
+            taskText.text.toString(),
             (thumbnail.drawable as ColorDrawable).color)
     }
 
@@ -275,7 +297,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         val endTime = task.endTime
 
         startTimePicker.setTime(startTime)
-        endTimePicker.setTime(endTime)
+
+        endTimeCheckbox.isChecked = endTime != null
+        if (endTime != null) {
+            endTimePicker.setTime(endTime)
+        }
 
         taskText.setText(task.desc)
         updateThumbnailColor(task.colorInt)

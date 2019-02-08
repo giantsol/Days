@@ -17,7 +17,7 @@ import org.threeten.bp.LocalTime
     indices = arrayOf(Index(value = ["date"])))
 data class Task(@ColumnInfo(name = "date") val date: LocalDate,
                 @ColumnInfo(name = "from_time") val startTime: LocalTime,
-                @ColumnInfo(name = "to_time") val endTime: LocalTime,
+                @ColumnInfo(name = "to_time") val endTime: LocalTime?,
                 @ColumnInfo(name = "task_description") val desc: String,
                 @ColumnInfo(name = "color_int") val colorInt: Int) : Parcelable {
 
