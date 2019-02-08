@@ -1,16 +1,19 @@
 package com.hansollee.mydays
 
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 
 class MainActivity : AppCompatActivity(), BackKeyDispatcher {
 
-    private lateinit var tabAdapter: MainTabAdapter
-    private lateinit var tabLayout: TabLayout
-    private lateinit var viewPager: ViewPager
+    companion object {
+        private const val DRAWER_GRAVITY = Gravity.START
+    }
 
     private val backKeyListeners: ArrayList<BackKeyListener> = ArrayList()
 
@@ -18,16 +21,28 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        tabLayout = findViewById(R.id.tablayout)
-        viewPager = findViewById(R.id.viewpager)
+        val tabLayout: TabLayout = findViewById(R.id.tablayout)
+        val viewPager: ViewPager = findViewById(R.id.viewpager)
+        val tabAdapter = MainTabAdapter(supportFragmentManager)
+        val menuButton: View = findViewById(R.id.menu_button)
+        val drawer: DrawerLayout = findViewById(R.id.drawer)
+        val miniMyDaysButton: View = findViewById(R.id.mini_mydays_button)
 
-        tabAdapter = MainTabAdapter(supportFragmentManager)
         viewPager.adapter = tabAdapter
         tabLayout.setupWithViewPager(viewPager)
         tabLayout.setTabTextColors(
             ContextCompat.getColor(this, R.color.tab_unselected),
             ContextCompat.getColor(this, R.color.tab_selected))
 
+        menuButton.setOnClickListener { _ ->
+            if (!drawer.isDrawerOpen(DRAWER_GRAVITY)) {
+                drawer.openDrawer(DRAWER_GRAVITY)
+            }
+        }
+
+        miniMyDaysButton.setOnClickListener { _ ->
+            
+        }
     }
 
     override fun addBackKeyListener(listener: BackKeyListener) {
