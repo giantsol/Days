@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/collapsed_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/collapsed_floating_icon"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@mipmap/ic_launcher_round"
+            />
+
+        <Button
+            android:id="@+id/collapsed_close_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:text="X"
+            />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/expanded_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/expanded_minimize_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Minimize"
+            />
+
+        <Button
+            android:id="@+id/expanded_open_activity_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open activity"
+            />
+
+    </LinearLayout>
+
+</FrameLayout>

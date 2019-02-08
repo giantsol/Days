@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.hansollee.mydays">
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -10,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".MainActivity"
                   android:screenOrientation="userPortrait"
             >
@@ -19,6 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <service android:name=".FloatingWidgetService"
+                 android:exported="false"
+            />
+
     </application>
 
 </manifest>
