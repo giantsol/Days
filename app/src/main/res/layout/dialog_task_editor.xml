@@ -58,8 +58,6 @@
                     android:gravity="center"
                     android:paddingLeft="4dp"
                     android:paddingStart="4dp"
-                    android:background="@drawable/button_background"
-                    android:clickable="true"
                     android:text="@string/start_time_text"
                     />
 
