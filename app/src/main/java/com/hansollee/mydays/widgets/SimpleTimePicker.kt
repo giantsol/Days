@@ -66,8 +66,8 @@ class SimpleTimePicker
     }
 
     companion object {
-        private const val MIN_HOUR = 0
-        private const val MAX_HOUR = 11
+        private const val MIN_HOUR = 1
+        private const val MAX_HOUR = 12
 
         private const val MIN_MINUTE = 0
         private const val MAX_MINUTE = 59
@@ -117,8 +117,8 @@ class SimpleTimePicker
                 picker.requestFocus()
                 hideKeyboardIfShown()
 
-                if ((oldVal == MAX_HOUR && newVal == MIN_HOUR) ||
-                    (oldVal == MIN_HOUR && newVal == MAX_HOUR)) {
+                if ((oldVal == MAX_HOUR - 1 && newVal == MAX_HOUR) ||
+                    (oldVal == MAX_HOUR && newVal == MAX_HOUR - 1)) {
                     invertAmPm()
                 }
 
@@ -137,14 +137,14 @@ class SimpleTimePicker
                 if (oldVal == MAX_MINUTE && newVal == MIN_MINUTE) {
                     // 59분에서 00분으로 넘어감
                     val newHour = hourPicker.value + 1
-                    if (newHour > MAX_HOUR) {
+                    if (newHour == MAX_HOUR) {
                         invertAmPm()
                     }
                     hourPicker.value = newHour
                 } else if (oldVal == MIN_MINUTE && newVal == MAX_MINUTE) {
                     // 00분에서 59분으로 넘어감
                     val newHour = hourPicker.value - 1
-                    if (newHour < MIN_HOUR) {
+                    if (newHour == MAX_HOUR - 1) {
                         invertAmPm()
                     }
                     hourPicker.value = newHour
