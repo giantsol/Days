@@ -86,14 +86,14 @@ class SimpleTimePicker
     private val minutePicker: NumberPicker
     private val amPmPicker: NumberPicker
 
-    val hourOfDay: Int
+    private val hourOfDay: Int
         get() = if (isAm()) hourPicker.value else hourPicker.value + 12
-    val minute: Int
+    private val minute: Int
         get() = minutePicker.value
 
     // 이 변수에 자주 접근하는건 안좋음. 매번 새로운 객체를 만들기 때문
     val time: LocalTime
-        get() = LocalTime.of(hourOfDay, minutePicker.value)
+        get() = LocalTime.of(hourOfDay, minute)
 
     var listener: OnTimeChangedListener? = null
 

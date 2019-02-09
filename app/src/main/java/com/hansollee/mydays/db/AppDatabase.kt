@@ -28,7 +28,8 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getInstance() = INSTANCE
 
-        val MIGRATION_2_3 = object : Migration(2, 3) {
+        // to_time 컬럼을 nonnull -> nullable 타입으로 변경
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.beginTransaction()
                 try {

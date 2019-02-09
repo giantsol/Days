@@ -21,7 +21,7 @@ private val dateStringFormatter = DateTimeFormatterBuilder()
     .appendLiteral(' ')
     .appendText(ChronoField.DAY_OF_WEEK, TextStyle.SHORT_STANDALONE)
     .toFormatter()
-fun LocalDate.toStringFormat(): String {
+fun LocalDate.toDisplayFormat(today: LocalDate): String {
     return if (this == today) {
         "${this.format(dateStringFormatter)} (Today)"
     } else {
@@ -34,7 +34,7 @@ private val timeStringFormatter = DateTimeFormatterBuilder()
     .appendLiteral(':')
     .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
     .toFormatter()
-fun LocalTime.toStringFormat(): String {
+fun LocalTime.toDisplayFormat(): String {
     return this.format(timeStringFormatter)
 }
 

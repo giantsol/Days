@@ -1,7 +1,6 @@
-package com.hansollee.mydays.task
+package com.hansollee.mydays.tasks
 
 import android.app.Activity
-import android.content.DialogInterface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,10 +13,10 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
+import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Task
-import com.hansollee.mydays.models.TaskDescription
+import com.hansollee.mydays.models.TaskPickerItem
 import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.SimpleTimePicker
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
@@ -28,7 +27,7 @@ import org.threeten.bp.LocalTime
  * Created by kevin-ee on 2019-02-01.
  */
 
-class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPickerDialog.Listener {
+class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPickerDialog.Listener {
 
     private data class ValidityCheckResult(val isOk: Boolean, val errorMessage: String?)
 
@@ -37,7 +36,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         private const val KEY_THUMBNAIL_COLOR = "key.thumbnail.color"
 
         private const val TAG_COLOR_PICKER = "ColorPicker"
-        private const val TAG_TASK_DESC_PICKER = "TaskDescPicker"
+        private const val TAG_TASK_PICKER = "TaskPicker"
 
         fun newInstance(task: Task? = null): TaskEditorDialog {
             val instance = TaskEditorDialog()
@@ -50,10 +49,10 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         }
     }
 
-    private lateinit var taskFragViewModel: TaskFragmentViewModel
+    private lateinit var tasksViewModel: TasksViewModel
     private lateinit var startTimePicker: SimpleTimePicker
     private lateinit var endTimePicker: SimpleTimePicker
-    private lateinit var taskText: EditText
+    private lateinit var taskDescriptionView: EditText
     private lateinit var thumbnail: ImageView
 
     // task를 클릭해서 열렸으면 nonnull, 새로만들기 버튼을 클릭해서 열렸으면 null
@@ -73,32 +72,30 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
-        originalTask = arguments.getParcelable(KEY_TASK)
-
         val view = inflater.inflate(R.layout.dialog_task_editor, container, false)
-        taskFragViewModel = ViewModelProviders.of(activity).get(TaskFragmentViewModel::class.java)
-        val title: TextView = view.findViewById(R.id.title)
+        originalTask = arguments.getParcelable(KEY_TASK)
+        tasksViewModel = TasksViewModel.getInstance(activity, GlobalViewModel.getInstance(activity).getTodayValue())
+        val titleView: TextView = view.findViewById(R.id.title)
         val endTimeTextContainer: View = view.findViewById(R.id.end_time_text_container)
         endTimeCheckbox = view.findViewById(R.id.end_time_checkbox)
         proceedingText = view.findViewById(R.id.text_proceeding)
         startTimePicker = view.findViewById(R.id.start_timepicker)
         endTimePicker = view.findViewById(R.id.end_timepicker)
-        taskText = view.findViewById(R.id.task_input)
+        taskDescriptionView = view.findViewById(R.id.task_description)
         thumbnail = view.findViewById(R.id.thumbnail)
         val previousTasksButton: View = view.findViewById(R.id.previous_tasks_button)
         val cancelButton: Button = view.findViewById(R.id.cancel_button)
         val deleteButton: Button = view.findViewById(R.id.delete_button)
         val okButton: Button = view.findViewById(R.id.ok_button)
-
         inputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-
         val res = context.resources
+
         fromToInvalidMsg = res.getString(R.string.from_and_to_invalid)
         taskDescriptionInvalidMsg = res.getString(R.string.task_description_invalid)
         val createNewTaskTitle = res.getString(R.string.create_new_task_title)
         val editTaskTitle = res.getString(R.string.edit_task_title)
 
-        title.text = if (originalTask == null) createNewTaskTitle else editTaskTitle
+        titleView.text = if (originalTask == null) createNewTaskTitle else editTaskTitle
 
         endTimeTextContainer.setOnClickListener { _ ->
             endTimeCheckbox.isChecked = !endTimeCheckbox.isChecked
@@ -107,6 +104,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         endTimeCheckbox.setOnCheckedChangeListener { v, isChecked ->
             toggleEndTimePickerVisibility(isChecked)
 
+            // 마침시간 체크 할때마다 현재 시각으로 설정되도록
             if (isChecked) {
                 endTimePicker.setTime(LocalTime.now())
             }
@@ -114,12 +112,14 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
 
         startTimePicker.setOnTimeChangedListener(object: SimpleTimePicker.OnTimeChangedListener {
             override fun onTimeChanged(hourOfDay: Int, minute: Int) {
+                // TODO: 이 기능은 없애고 다음 날 까지 이어지도록 해야함
                 if (endTimePicker.visibility == View.VISIBLE && endTimePicker < startTimePicker) {
                     endTimePicker.setTime(hourOfDay, minute)
                 }
             }
         })
 
+        // 죽었다 살아났을 때 기존에 떠있던 dialog에 콜백 다시 달아줌
         (fragmentManager.findFragmentByTag(TAG_COLOR_PICKER) as? ColorPickerDialog)
             ?.setColorPickerDialogListener(this)
 
@@ -135,14 +135,16 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
                 .show(fragmentManager, TAG_COLOR_PICKER)
         }
 
-        (fragmentManager.findFragmentByTag(TAG_TASK_DESC_PICKER) as? TaskDescPickerDialog)
+        // 죽었다 살아났을 때 기존에 떠있던 dialog에 콜백 다시 달아줌
+        (fragmentManager.findFragmentByTag(TAG_TASK_PICKER) as? TaskPickerDialog)
             ?.setListener(this)
 
         previousTasksButton.setOnClickListener { _ ->
             hideKeyboardIfShown()
 
-            TaskDescPickerDialog().apply { setListener(this@TaskEditorDialog) }
-                .show(fragmentManager.beginTransaction(), TAG_TASK_DESC_PICKER)
+            TaskPickerDialog()
+                .apply { setListener(this@TaskEditorDialog) }
+                .show(fragmentManager.beginTransaction(), TAG_TASK_PICKER)
         }
 
         cancelButton.setOnClickListener { _ ->
@@ -152,7 +154,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         if (originalTask != null) {
             deleteButton.visibility = View.VISIBLE
             deleteButton.setOnClickListener { _ ->
-                taskFragViewModel.deleteTask(originalTask!!)
+                tasksViewModel.deleteTask(originalTask!!)
                 dismiss()
             }
         } else {
@@ -165,9 +167,9 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
             val validityCheckResult = getValidityCheckResult()
             if (validityCheckResult.isOk) {
                 if (originalTask == null) {
-                    taskFragViewModel.insertNewTask(createNewTaskFromInputs())
+                    tasksViewModel.insertNewTask(createNewTaskFromInputs())
                 } else {
-                    taskFragViewModel.updateTask(getUpdatedTaskWithInputs(originalTask!!))
+                    tasksViewModel.updateTask(getUpdatedTaskWithInputs(originalTask!!))
                 }
                 dismiss()
             } else {
@@ -176,7 +178,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         }
 
         if (originalTask != null) {
-            fillViewsWithTask(originalTask!!)
+            updateViewsWithTask(originalTask!!)
         } else {
             startTimePicker.setTime(LocalTime.now())
         }
@@ -200,32 +202,36 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
 
     private fun getValidityCheckResult(): ValidityCheckResult {
         val startTime = startTimePicker.time
-        val endTime = if (endTimePicker.visibility == View.VISIBLE) endTimePicker.time else null
+        val endTime = getEndTime()
         if (endTime != null && startTime > endTime) {
             return ValidityCheckResult(false, fromToInvalidMsg)
         }
 
-        if (taskText.text.trim().isEmpty()) {
+        if (taskDescriptionView.text.trim().isEmpty()) {
             return ValidityCheckResult(false, taskDescriptionInvalidMsg)
         }
 
         return ValidityCheckResult(true, null)
     }
 
+    // 마침시간 체크 여부에 따라 null을 주거나 endTimePicker의 값을 줌
+    private fun getEndTime(): LocalTime?
+        = if (endTimePicker.visibility == View.VISIBLE) endTimePicker.time else null
+
     private fun createNewTaskFromInputs(): Task {
-        val date = originalTask?.date ?: taskFragViewModel.getCurrentDate().value
+        val date = originalTask?.date ?: tasksViewModel.getCurrentDate().value
         return Task(
             date,
             startTimePicker.time,
-            if (endTimePicker.visibility == View.VISIBLE) endTimePicker.time else null,
-            taskText.text.toString(),
+            getEndTime(),
+            taskDescriptionView.text.toString(),
             (thumbnail.drawable as ColorDrawable).color)
     }
 
     private fun getUpdatedTaskWithInputs(originalTask: Task): Task
         = createNewTaskFromInputs().also { it.id = originalTask.id }
 
-    private fun fillViewsWithTask(task: Task) {
+    private fun updateViewsWithTask(task: Task) {
         val startTime = task.startTime
         val endTime = task.endTime
 
@@ -236,7 +242,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
             endTimePicker.setTime(endTime)
         }
 
-        taskText.setText(task.desc)
+        taskDescriptionView.setText(task.desc)
         updateThumbnailColor(task.colorInt)
     }
 
@@ -248,9 +254,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         }
     }
 
-    override fun onDialogDismissed(dialogId: Int) {
-
-    }
+    // ColorPickerListener꺼... 왜 이렇게 만들었징
+    override fun onDialogDismissed(dialogId: Int) { }
 
     override fun onColorSelected(dialogId: Int, color: Int) {
         updateThumbnailColor(color)
@@ -260,9 +265,9 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         (thumbnail.drawable.mutate() as ColorDrawable).color = color
     }
 
-    override fun onTaskDescPicked(taskDescription: TaskDescription) {
-        taskText.setText(taskDescription.desc)
-        updateThumbnailColor(taskDescription.colorInt)
+    override fun onTaskPicked(taskPickerItem: TaskPickerItem) {
+        taskDescriptionView.setText(taskPickerItem.desc)
+        updateThumbnailColor(taskPickerItem.colorInt)
     }
 
     private fun hideKeyboardIfShown() {
@@ -276,7 +281,4 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskDescPi
         outState.putInt(KEY_THUMBNAIL_COLOR, currentThumbnailColor)
     }
 
-    override fun onDismiss(dialog: DialogInterface?) {
-        super.onDismiss(dialog)
-    }
 }

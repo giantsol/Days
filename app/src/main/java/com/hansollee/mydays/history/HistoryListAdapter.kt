@@ -8,9 +8,10 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.History
-import com.hansollee.mydays.toStringFormat
+import com.hansollee.mydays.toDisplayFormat
 import com.hansollee.mydays.widgets.HistoryGraphView
 
 /**
@@ -18,47 +19,46 @@ import com.hansollee.mydays.widgets.HistoryGraphView
  */
 
 class HistoryListAdapter(context: Context,
-                        private val historyFragViewModel: HistoryFragmentViewModel,
-                        private val itemClickListener: HistoryItemClickListener)
-    : RecyclerView.Adapter<HistoryListAdapter.HistoryItemViewHolder>() {
+                        private val globalViewModel: GlobalViewModel,
+                        private val itemClickListener: ItemClickListener): RecyclerView.Adapter<HistoryListAdapter.ItemViewHolder>() {
 
-    interface HistoryItemClickListener {
+    interface ItemClickListener {
         fun onItemClick(history: History)
     }
 
     private val inflater = LayoutInflater.from(context)
-    private val historyItems: ArrayList<History> = ArrayList()
+    private val items: ArrayList<History> = ArrayList()
     @ColorInt private val defaultGraphColor = ContextCompat.getColor(context, R.color.default_history_graph_color)
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): HistoryItemViewHolder {
-        return HistoryItemViewHolder.create(inflater, parent)
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ItemViewHolder {
+        return ItemViewHolder.create(inflater, parent)
     }
 
-    override fun getItemCount(): Int = historyItems.size
+    override fun getItemCount(): Int = items.size
 
-    override fun onBindViewHolder(holder: HistoryItemViewHolder, position: Int) {
-        holder.bind(historyItems[position], itemClickListener, defaultGraphColor)
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        holder.bind(items[position], itemClickListener, defaultGraphColor, globalViewModel)
     }
 
-    fun updateHistoryItems(items: List<History>) {
-        historyItems.clear()
-        historyItems.addAll(items)
+    fun updateItems(items: List<History>) {
+        this.items.clear()
+        this.items.addAll(items)
         notifyDataSetChanged()
     }
 
-    class HistoryItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    class ItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
         companion object {
             fun create(inflater: LayoutInflater, parent: ViewGroup?)
-                = HistoryItemViewHolder(inflater.inflate(R.layout.view_history_item, parent, false))
+                = ItemViewHolder(inflater.inflate(R.layout.view_history_item, parent, false))
         }
 
         private val date: TextView = view.findViewById(R.id.date)
         private val graph: HistoryGraphView = view.findViewById(R.id.graph)
 
-        fun bind(history: History, itemClickListener: HistoryItemClickListener,
-                 @ColorInt defGraphColor: Int) {
-            date.text = history.date.toStringFormat()
+        fun bind(history: History, itemClickListener: ItemClickListener,
+                 @ColorInt defGraphColor: Int, globalViewModel: GlobalViewModel) {
+            date.text = history.date.toDisplayFormat(globalViewModel.getTodayValue())
             graph.setDefaultColor(defGraphColor)
             graph.drawHistory(history)
         }

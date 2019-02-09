@@ -8,7 +8,6 @@ import android.os.Handler
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -22,15 +21,22 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         private const val SECOND_BACK_BUTTON_TO_QUIT_INTERVAL = 2000L
     }
 
-    private val backKeyListeners: ArrayList<BackKeyListener> = ArrayList()
-    private lateinit var pressAgainToQuitMsg: String
+    private lateinit var globalViewModel: GlobalViewModel
+
     private val handler = Handler()
+    private lateinit var pressAgainToQuitMsg: String
     private var isWaitingForSecondButtonToQuit = false
+    private val resetWaitingForSecondButton = Runnable {
+        isWaitingForSecondButtonToQuit = false
+    }
+
+    private val backKeyListeners: ArrayList<BackKeyListener> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        globalViewModel = GlobalViewModel.getInstance(this)
         val tabLayout: TabLayout = findViewById(R.id.tablayout)
         val viewPager: ViewPager = findViewById(R.id.viewpager)
         val tabAdapter = MainTabAdapter(supportFragmentManager)
@@ -43,7 +49,8 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         tabLayout.setupWithViewPager(viewPager)
         tabLayout.setTabTextColors(
             ContextCompat.getColor(this, R.color.tab_unselected),
-            ContextCompat.getColor(this, R.color.tab_selected))
+            ContextCompat.getColor(this, R.color.tab_selected)
+        )
 
         menuButton.setOnClickListener { _ ->
             if (!drawer.isDrawerOpen(DRAWER_GRAVITY)) {
@@ -108,12 +115,13 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         }
     }
 
-    private val resetWaitingForSecondButton = Runnable {
-        isWaitingForSecondButtonToQuit = false
-    }
-
     private fun beginWaitingForSecondBackButton() {
         isWaitingForSecondButtonToQuit = true
         handler.postDelayed(resetWaitingForSecondButton, SECOND_BACK_BUTTON_TO_QUIT_INTERVAL)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        globalViewModel.updateToday()
     }
 }

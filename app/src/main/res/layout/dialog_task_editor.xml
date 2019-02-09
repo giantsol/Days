@@ -150,7 +150,7 @@
             >
 
             <EditText
-                android:id="@+id/task_input"
+                android:id="@+id/task_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

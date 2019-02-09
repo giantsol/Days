@@ -1,4 +1,4 @@
-package com.hansollee.mydays.task
+package com.hansollee.mydays.tasks
 
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
@@ -9,36 +9,35 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hansollee.mydays.R
-import com.hansollee.mydays.models.TaskDescription
+import com.hansollee.mydays.models.TaskPickerItem
 
 /**
  * Created by kevin-ee on 2019-02-06.
  */
-class TaskDescListAdapter(context: Context,
-                          private val taskFragViewModel: TaskFragmentViewModel,
-                          private val itemClickListener: ItemClickListener)
-    : RecyclerView.Adapter<TaskDescListAdapter.ItemViewHolder>() {
+class TaskPickerListAdapter(context: Context,
+                            private val itemClickListener: ItemClickListener)
+    : RecyclerView.Adapter<TaskPickerListAdapter.ItemViewHolder>() {
 
     interface ItemClickListener {
-        fun onItemClick(taskDescription: TaskDescription)
+        fun onItemClick(taskPickerItem: TaskPickerItem)
     }
 
     private val inflater = LayoutInflater.from(context)
-    private val taskDescs: ArrayList<TaskDescription> = ArrayList()
+    private val items: ArrayList<TaskPickerItem> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ItemViewHolder {
         return ItemViewHolder.create(inflater, parent)
     }
 
-    override fun getItemCount(): Int = taskDescs.size
+    override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.bind(taskDescs[position], itemClickListener, taskFragViewModel)
+        holder.bind(items[position], itemClickListener)
     }
 
-    fun setItems(items: List<TaskDescription>) {
-        taskDescs.clear()
-        taskDescs.addAll(items)
+    fun updateItems(items: List<TaskPickerItem>) {
+        this.items.clear()
+        this.items.addAll(items)
         notifyDataSetChanged()
     }
 
@@ -53,11 +52,9 @@ class TaskDescListAdapter(context: Context,
         private val thumbnail: ImageView = view.findViewById(R.id.thumbnail)
         private val taskDescription: TextView = view.findViewById(R.id.task_description)
 
-        fun bind(item: TaskDescription, itemClickListener: ItemClickListener, viewModel: TaskFragmentViewModel) {
+        fun bind(item: TaskPickerItem, itemClickListener: ItemClickListener) {
             (thumbnail.drawable.mutate() as ColorDrawable).color = item.colorInt
-
             taskDescription.text = item.desc
-
             contentContainer.setOnClickListener { _ ->
                 itemClickListener.onItemClick(item)
             }

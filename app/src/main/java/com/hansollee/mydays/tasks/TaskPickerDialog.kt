@@ -1,4 +1,4 @@
-package com.hansollee.mydays.task
+package com.hansollee.mydays.tasks
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,47 +6,47 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
-import com.hansollee.mydays.models.TaskDescription
+import com.hansollee.mydays.models.TaskPickerItem
 
 /**
  * Created by kevin-ee on 2019-02-06.
  */
 
-class TaskDescPickerDialog : DialogFragment(), TaskDescListAdapter.ItemClickListener {
+class TaskPickerDialog : DialogFragment(), TaskPickerListAdapter.ItemClickListener {
 
     interface Listener {
-        fun onTaskDescPicked(taskDescription: TaskDescription)
+        fun onTaskPicked(taskPickerItem: TaskPickerItem)
     }
 
     private var listener: Listener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.dialog_task_desc_picker, container, false)
-        val taskFragViewModel = ViewModelProviders.of(activity).get(TaskFragmentViewModel::class.java)
+        val tasksViewModel = TasksViewModel.getInstance(activity, GlobalViewModel.getInstance(activity).getTodayValue())
         val loadingView: View = view.findViewById(R.id.loading_view)
-        val taskDescList: RecyclerView = view.findViewById(R.id.task_desc_list)
-        val taskDescListAdapter = TaskDescListAdapter(context, taskFragViewModel, this)
+        val taskRecyclerview: RecyclerView = view.findViewById(R.id.task_list)
+        val adapter = TaskPickerListAdapter(context, this)
         val emptyView: View = view.findViewById(R.id.empty_view)
 
-        taskDescList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        taskDescList.adapter = taskDescListAdapter
+        taskRecyclerview.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        taskRecyclerview.adapter = adapter
 
-        taskFragViewModel.getAllTaskDescriptions().observe(this, Observer<List<TaskDescription>> { taskDescs ->
+        tasksViewModel.getAllTaskPickerItems().observe(this, Observer<List<TaskPickerItem>> { items ->
             loadingView.visibility = View.GONE
 
-            if (taskDescs.isEmpty()) {
+            if (items.isEmpty()) {
                 emptyView.visibility = View.VISIBLE
-                taskDescList.visibility = View.GONE
+                taskRecyclerview.visibility = View.GONE
             } else {
                 emptyView.visibility = View.GONE
-                taskDescList.visibility = View.VISIBLE
+                taskRecyclerview.visibility = View.VISIBLE
             }
 
-            taskDescListAdapter.setItems(taskDescs)
+            adapter.updateItems(items)
         })
 
         return view
@@ -64,8 +64,8 @@ class TaskDescPickerDialog : DialogFragment(), TaskDescListAdapter.ItemClickList
         this.listener = listener
     }
 
-    override fun onItemClick(taskDescription: TaskDescription) {
-        listener?.onTaskDescPicked(taskDescription)
+    override fun onItemClick(taskPickerItem: TaskPickerItem) {
+        listener?.onTaskPicked(taskPickerItem)
         dismiss()
     }
 

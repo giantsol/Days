@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.hansollee.mydays.history.HistoryFragment
-import com.hansollee.mydays.task.TaskFragment
+import com.hansollee.mydays.tasks.TasksFragment
 
 /**
  * Created by kevin-ee on 2019-01-31.
@@ -12,17 +12,16 @@ import com.hansollee.mydays.task.TaskFragment
 
 class MainTabAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
-    private var taskFragmentTitle: String = "Task"
-    private var historyFragmentTitle: String = "History"
+    private val taskFragmentTitle: String
+    private val historyFragmentTitle: String
 
     init {
-        appContext?.resources?.also {
-            taskFragmentTitle = it.getString(R.string.task_fragment_title)
-            historyFragmentTitle = it.getString(R.string.history_fragment_title)
-        }
+        val res = appContext!!.resources
+        taskFragmentTitle = res.getString(R.string.task_fragment_title)
+        historyFragmentTitle = res.getString(R.string.history_fragment_title)
     }
 
-    override fun getItem(position: Int): Fragment = if (position == 0) TaskFragment() else HistoryFragment()
+    override fun getItem(position: Int): Fragment = if (position == 0) TasksFragment() else HistoryFragment()
 
     override fun getCount(): Int = 2
 

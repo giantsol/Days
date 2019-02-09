@@ -1,4 +1,4 @@
-package com.hansollee.mydays.task
+package com.hansollee.mydays.tasks
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,35 +7,36 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
-import com.hansollee.mydays.history.HistoryFragmentViewModel
+import com.hansollee.mydays.history.HistoryViewModel
 import com.hansollee.mydays.models.Task
-import com.hansollee.mydays.toStringFormat
+import com.hansollee.mydays.toDisplayFormat
 import org.threeten.bp.LocalDate
 
 /**
  * Created by kevin-ee on 2019-01-31.
  */
 
-class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
+class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater!!.inflate(R.layout.fragment_task, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.fragment_task, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val viewModel = ViewModelProviders.of(activity).get(TaskFragmentViewModel::class.java)
-        val historyFragviewModel = ViewModelProviders.of(activity).get(HistoryFragmentViewModel::class.java)
+        val globalViewModel = GlobalViewModel.getInstance(activity)
+        val tasksViewModel = TasksViewModel.getInstance(activity, globalViewModel.getTodayValue())
+        val historyViewModel = HistoryViewModel.getInstance(activity, globalViewModel.getTodayValue())
         val floatingButton: FloatingActionButton = view.findViewById(R.id.floating_button)
         val arrowBack: View = view.findViewById(R.id.arrow_back)
         val arrowForward: View = view.findViewById(R.id.arrow_forward)
         val dateText: TextView = view.findViewById(R.id.date_text)
         val taskList: RecyclerView = view.findViewById(R.id.task_list)
-        val taskListAdapter = TaskListAdapter(context, viewModel, this)
+        val taskListAdapter = TaskListAdapter(context, this)
         val progressView: View = view.findViewById(R.id.progress_bar)
         val emptyView: View = view.findViewById(R.id.empty_view)
 
@@ -44,15 +45,15 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
         }
 
         arrowBack.setOnClickListener { _ ->
-            viewModel.changeCurrentDate(-1)
+            tasksViewModel.changeCurrentDate(-1)
         }
 
         arrowForward.setOnClickListener { _ ->
-            viewModel.changeCurrentDate(1)
+            tasksViewModel.changeCurrentDate(1)
         }
 
         dateText.setOnClickListener { _ ->
-            viewModel.resetCurrentDateToToday()
+            tasksViewModel.resetCurrentDateToToday()
         }
 
         taskList.also {
@@ -60,13 +61,19 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
             it.adapter = taskListAdapter
         }
 
-        viewModel.also {
+        globalViewModel.getToday().observe(this, Observer<LocalDate> { today ->
+            if (tasksViewModel.updateTodayValue(today)) {
+                dateText.text = tasksViewModel.getCurrentDate().value.toDisplayFormat(today)
+            }
+        })
+
+        tasksViewModel.also {
             it.getCurrentDate().observe(this, Observer<LocalDate> { currentDate ->
-                dateText.text = currentDate.toStringFormat()
-                viewModel.loadTasksForDate(currentDate)
+                dateText.text = currentDate.toDisplayFormat(globalViewModel.getTodayValue())
+                tasksViewModel.loadTasksForDate(currentDate)
             })
 
-            it.getCurrentTasks().observe(this, Observer<TaskFragmentViewModel.TasksResult> { tasksResult ->
+            it.getCurrentTasks().observe(this, Observer<TasksViewModel.TasksResult> { tasksResult ->
                 val tasks = tasksResult.tasks
 
                 if (tasks.isEmpty()) {
@@ -77,10 +84,10 @@ class TaskFragment: Fragment(), TaskListAdapter.ItemClickListener {
                     taskList.visibility = View.VISIBLE
                 }
 
-                taskListAdapter.setTasks(tasks)
+                taskListAdapter.updateItems(tasks)
 
-                if (tasksResult.byUpdate) {
-                    historyFragviewModel.onTasksUpdated(it.getCurrentDate().value, tasks)
+                if (tasksResult.byUserUpdate) {
+                    historyViewModel.onUserUpdatedTasks(it.getCurrentDate().value, tasks)
                 }
 
             })
