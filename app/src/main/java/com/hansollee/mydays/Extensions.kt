@@ -21,9 +21,12 @@ private val dateStringFormatter = DateTimeFormatterBuilder()
     .appendLiteral(' ')
     .appendText(ChronoField.DAY_OF_WEEK, TextStyle.SHORT_STANDALONE)
     .toFormatter()
+private val todayDisplayFormat by lazy {
+    appContext!!.resources.getString(R.string.today_display_format)
+}
 fun LocalDate.toDisplayFormat(today: LocalDate): String {
     return if (this == today) {
-        "${this.format(dateStringFormatter)} (Today)"
+        String.format(todayDisplayFormat, this.format(com.hansollee.mydays.dateStringFormatter))
     } else {
         this.format(dateStringFormatter)
     }

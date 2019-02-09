@@ -32,4 +32,6 @@
     <string name="text_proceeding">Proceeding</string>
 
     <string name="press_again_to_quit">Press again to quit</string>
+    
+    <string name="today_display_format">%1$s (Today)</string>
 </resources>

@@ -32,4 +32,6 @@
     <string name="text_proceeding">진행중</string>
 
     <string name="press_again_to_quit">한 번 더 누르면 종료됩니다.</string>
+
+    <string name="today_display_format">%1$s (오늘)</string>
 </resources>
