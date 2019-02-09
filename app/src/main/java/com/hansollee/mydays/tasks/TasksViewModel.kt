@@ -58,7 +58,13 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
     }
 
     fun resetCurrentDateToToday() {
-        currentDate.value = today
+        setCurrentDate(today)
+    }
+
+    fun setCurrentDate(date: LocalDate) {
+        if (currentDate.value != date) {
+            currentDate.value = date
+        }
     }
 
     fun insertNewTask(task: Task) {

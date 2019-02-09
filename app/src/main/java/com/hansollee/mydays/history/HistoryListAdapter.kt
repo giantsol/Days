@@ -46,13 +46,14 @@ class HistoryListAdapter(context: Context,
         notifyDataSetChanged()
     }
 
-    class ItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         companion object {
             fun create(inflater: LayoutInflater, parent: ViewGroup?)
                 = ItemViewHolder(inflater.inflate(R.layout.view_history_item, parent, false))
         }
 
+        private val contentContainer: View = view.findViewById(R.id.content_container)
         private val date: TextView = view.findViewById(R.id.date)
         private val graph: HistoryGraphView = view.findViewById(R.id.graph)
 
@@ -61,6 +62,10 @@ class HistoryListAdapter(context: Context,
             date.text = history.date.toDisplayFormat(globalViewModel.getTodayValue())
             graph.setDefaultColor(defGraphColor)
             graph.drawHistory(history)
+
+            contentContainer.setOnClickListener { _ ->
+                itemClickListener.onItemClick(history)
+            }
         }
 
     }

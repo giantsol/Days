@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
     companion object {
         private const val DRAWER_GRAVITY = Gravity.START
         private const val SECOND_BACK_BUTTON_TO_QUIT_INTERVAL = 2000L
+        private const val TABLAYOUT_ANIMATION_DURATION = 300L
     }
 
     private lateinit var globalViewModel: GlobalViewModel
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
     private val resetWaitingForSecondButton = Runnable {
         isWaitingForSecondButtonToQuit = false
     }
+    private lateinit var viewPager: ViewPager
 
     private val backKeyListeners: ArrayList<BackKeyListener> = ArrayList()
 
@@ -38,7 +40,7 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
 
         globalViewModel = GlobalViewModel.getInstance(this)
         val tabLayout: TabLayout = findViewById(R.id.tablayout)
-        val viewPager: ViewPager = findViewById(R.id.viewpager)
+        viewPager = findViewById(R.id.viewpager)
         val tabAdapter = MainTabAdapter(supportFragmentManager)
         val menuButton: View = findViewById(R.id.menu_button)
         val drawer: DrawerLayout = findViewById(R.id.drawer)
@@ -123,5 +125,13 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
     override fun onStart() {
         super.onStart()
         globalViewModel.updateToday()
+    }
+
+    fun goToPage(page: Int, animate: Boolean, callbackWhenAnimate: () -> Unit) {
+        viewPager.setCurrentItem(page, animate)
+
+        if (animate) {
+            handler.postDelayed(Runnable(callbackWhenAnimate), TABLAYOUT_ANIMATION_DURATION)
+        }
     }
 }
