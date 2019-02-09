@@ -52,9 +52,11 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
         return currentDate
     }
 
+    fun getCurrentDateValue(): LocalDate = currentDate.value
+
     // currentDate를 days만큼 앞/뒤로 이동시킨다
     fun changeCurrentDate(days: Int) {
-        currentDate.value = getCurrentDate().value.plusDays(days.toLong())
+        currentDate.value = getCurrentDateValue().plusDays(days.toLong())
     }
 
     fun resetCurrentDateToToday() {
@@ -72,7 +74,8 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 isLoading.value = true
-                dateThatUserModified = task.date
+                //TODO: 이거 어케할거냐
+//                dateThatUserModified = task.date
             }
     }
 
@@ -81,7 +84,7 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 isLoading.value = true
-                dateThatUserModified = task.date
+//                dateThatUserModified = task.date
             }
     }
 
@@ -90,14 +93,14 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 isLoading.value = true
-                dateThatUserModified = task.date
+//                dateThatUserModified = task.date
             }
     }
 
     fun getCurrentTasks(): LiveData<TasksResult> {
         if (!::currentTasks.isInitialized) {
             currentTasks = MutableLiveData()
-            loadTasksForDate(getCurrentDate().value)
+            loadTasksForDate(getCurrentDateValue())
         }
 
         return currentTasks
@@ -135,7 +138,7 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
 
     private fun loadAllTaskPickerItems() {
         loadAllTaskPickerItemsWork?.dispose()
-        loadAllTaskPickerItemsWork = taskDao.getAllTaskDescriptions()
+        loadAllTaskPickerItemsWork = taskDao.getAllTaskPickerItems()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ tasks ->
                 allTaskPickerItems.value = tasks

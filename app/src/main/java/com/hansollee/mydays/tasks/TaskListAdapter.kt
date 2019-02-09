@@ -11,14 +11,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hansollee.mydays.R
 import com.hansollee.mydays.appContext
 import com.hansollee.mydays.models.Task
-import com.hansollee.mydays.toDisplayFormat
+import com.hansollee.mydays.toEndTimeDisplayFormat
+import com.hansollee.mydays.toStartTimeDisplayFormat
 
 /**
  * Created by kevin-ee on 2019-02-01.
  */
 
 class TaskListAdapter(context: Context,
-                      private val itemClickListener: ItemClickListener): RecyclerView.Adapter<TaskListAdapter.ItemViewHolder>() {
+                      private val itemClickListener: ItemClickListener,
+                      private val tasksViewModel: TasksViewModel): RecyclerView.Adapter<TaskListAdapter.ItemViewHolder>() {
 
     interface ItemClickListener {
         fun onItemClick(task: Task)
@@ -34,7 +36,7 @@ class TaskListAdapter(context: Context,
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.bind(items[position], itemClickListener)
+        holder.bind(items[position], itemClickListener, tasksViewModel)
     }
 
     fun updateItems(tasks: List<Task>) {
@@ -58,13 +60,15 @@ class TaskListAdapter(context: Context,
         private val timeRange: TextView = view.findViewById(R.id.time_range)
         private val taskDescription: TextView = view.findViewById(R.id.task_description)
 
-        fun bind(task: Task, itemClickListener: ItemClickListener) {
+        fun bind(task: Task, itemClickListener: ItemClickListener, tasksViewModel: TasksViewModel) {
+            val currentDate = tasksViewModel.getCurrentDateValue()
+
             (thumbnail.drawable.mutate() as ColorDrawable).color = task.colorInt
 
             timeRange.text = String.format(
                 TIME_RANGE_FORMAT,
-                task.startTime.toDisplayFormat(),
-                if (task.endTime == null) PROCEEDING_TEXT else task.endTime.toDisplayFormat()
+                task.startDateTime.toStartTimeDisplayFormat(currentDate),
+                if (task.endDateTime == null) PROCEEDING_TEXT else task.endDateTime.toEndTimeDisplayFormat(currentDate)
             )
             taskDescription.text = task.desc
 

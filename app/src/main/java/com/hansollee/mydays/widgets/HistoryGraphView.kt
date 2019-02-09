@@ -11,7 +11,9 @@ import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.History
+import com.hansollee.mydays.toEndTime
 import com.hansollee.mydays.toMinuteOfDay
+import com.hansollee.mydays.toStartTime
 
 /**
  * Created by kevin-ee on 2019-02-03.
@@ -73,13 +75,14 @@ class HistoryGraphView
         }
 
         historyData?.also { history ->
+            val date = history.date
             val tasks = history.tasks
 
             for (task in tasks) {
-                if (task.endTime != null) {
+                if (task.endDateTime != null) {
                     paint.color = task.colorInt
-                    graphRect.left = task.startTime.toMinuteOfDay() * distancePerMinute
-                    graphRect.right = task.endTime.toMinuteOfDay() * distancePerMinute
+                    graphRect.left = task.startDateTime.toStartTime(date).toMinuteOfDay() * distancePerMinute
+                    graphRect.right = task.endDateTime.toEndTime(date).toMinuteOfDay() * distancePerMinute
                     canvas.drawRect(graphRect, paint)
                 }
             }

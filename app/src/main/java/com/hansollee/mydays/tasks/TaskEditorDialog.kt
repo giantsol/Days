@@ -17,10 +17,13 @@ import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.models.TaskPickerItem
+import com.hansollee.mydays.toDisplayFormat
+import com.hansollee.mydays.toLocalDate
 import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.SimpleTimePicker
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
 
 /**
@@ -49,16 +52,20 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         }
     }
 
+    private lateinit var globalViewModel: GlobalViewModel
     private lateinit var tasksViewModel: TasksViewModel
     private lateinit var startTimePicker: SimpleTimePicker
     private lateinit var endTimePicker: SimpleTimePicker
     private lateinit var taskDescriptionView: EditText
     private lateinit var thumbnail: ImageView
+    private lateinit var startDateText: TextView
+    private lateinit var endDateText: TextView
+    private lateinit var endTimeContainer: View
 
     // task를 클릭해서 열렸으면 nonnull, 새로만들기 버튼을 클릭해서 열렸으면 null
     private var originalTask: Task? = null
 
-    private lateinit var fromToInvalidMsg: String
+    private lateinit var startEndInvalidMsg: String
     private lateinit var taskDescriptionInvalidMsg: String
 
     private val currentThumbnailColor: Int
@@ -74,7 +81,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
 
         val view = inflater.inflate(R.layout.dialog_task_editor, container, false)
         originalTask = arguments.getParcelable(KEY_TASK)
-        tasksViewModel = TasksViewModel.getInstance(activity, GlobalViewModel.getInstance(activity).getTodayValue())
+        globalViewModel = GlobalViewModel.getInstance(activity)
+        tasksViewModel = TasksViewModel.getInstance(activity, globalViewModel.getTodayValue())
         val titleView: TextView = view.findViewById(R.id.title)
         val endTimeTextContainer: View = view.findViewById(R.id.end_time_text_container)
         endTimeCheckbox = view.findViewById(R.id.end_time_checkbox)
@@ -83,6 +91,9 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         endTimePicker = view.findViewById(R.id.end_timepicker)
         taskDescriptionView = view.findViewById(R.id.task_description)
         thumbnail = view.findViewById(R.id.thumbnail)
+        startDateText = view.findViewById(R.id.start_date_text)
+        endDateText = view.findViewById(R.id.end_date_text)
+        endTimeContainer = view.findViewById(R.id.end_time_container)
         val previousTasksButton: View = view.findViewById(R.id.previous_tasks_button)
         val cancelButton: Button = view.findViewById(R.id.cancel_button)
         val deleteButton: Button = view.findViewById(R.id.delete_button)
@@ -90,7 +101,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         inputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         val res = context.resources
 
-        fromToInvalidMsg = res.getString(R.string.from_and_to_invalid)
+        startEndInvalidMsg = res.getString(R.string.start_end_time_invalid)
         taskDescriptionInvalidMsg = res.getString(R.string.task_description_invalid)
         val createNewTaskTitle = res.getString(R.string.create_new_task_title)
         val editTaskTitle = res.getString(R.string.edit_task_title)
@@ -102,10 +113,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         }
 
         endTimeCheckbox.setOnCheckedChangeListener { v, isChecked ->
-            toggleEndTimePickerVisibility(isChecked)
+            toggleEndTimeVisibility(isChecked)
 
             // 마침시간 체크 할때마다 현재 시각으로 설정되도록
             if (isChecked) {
+                endDateText.text = globalViewModel.getTodayValue().toDisplayFormat(globalViewModel.getTodayValue())
                 endTimePicker.setTime(LocalTime.now())
             }
         }
@@ -113,7 +125,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         startTimePicker.setOnTimeChangedListener(object: SimpleTimePicker.OnTimeChangedListener {
             override fun onTimeChanged(hourOfDay: Int, minute: Int) {
                 // TODO: 이 기능은 없애고 다음 날 까지 이어지도록 해야함
-                if (endTimePicker.visibility == View.VISIBLE && endTimePicker < startTimePicker) {
+                if (endTimeContainer.visibility == View.VISIBLE && endTimePicker < startTimePicker) {
                     endTimePicker.setTime(hourOfDay, minute)
                 }
             }
@@ -180,6 +192,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         if (originalTask != null) {
             updateViewsWithTask(originalTask!!)
         } else {
+            startDateText.text = tasksViewModel.getCurrentDateValue().toDisplayFormat(globalViewModel.getTodayValue())
             startTimePicker.setTime(LocalTime.now())
         }
 
@@ -190,21 +203,21 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         return view
     }
 
-    private fun toggleEndTimePickerVisibility(pickerVisible: Boolean) {
-        if (pickerVisible) {
-            endTimePicker.visibility = View.VISIBLE
-            proceedingText.visibility = View.GONE
+    private fun toggleEndTimeVisibility(endTimeVisible: Boolean) {
+        if (endTimeVisible) {
+            endTimeContainer.visibility = View.VISIBLE
+            proceedingText.visibility = View.INVISIBLE
         } else {
-            endTimePicker.visibility = View.GONE
+            endTimeContainer.visibility = View.INVISIBLE
             proceedingText.visibility = View.VISIBLE
         }
     }
 
     private fun getValidityCheckResult(): ValidityCheckResult {
-        val startTime = startTimePicker.time
-        val endTime = getEndTime()
-        if (endTime != null && startTime > endTime) {
-            return ValidityCheckResult(false, fromToInvalidMsg)
+        val start = getStartTime()
+        val end = getEndTime()
+        if (end != null && start > end) {
+            return ValidityCheckResult(false, startEndInvalidMsg)
         }
 
         if (taskDescriptionView.text.trim().isEmpty()) {
@@ -214,32 +227,38 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         return ValidityCheckResult(true, null)
     }
 
-    // 마침시간 체크 여부에 따라 null을 주거나 endTimePicker의 값을 줌
-    private fun getEndTime(): LocalTime?
-        = if (endTimePicker.visibility == View.VISIBLE) endTimePicker.time else null
-
     private fun createNewTaskFromInputs(): Task {
-        val date = originalTask?.date ?: tasksViewModel.getCurrentDate().value
+        val start = getStartTime()
+        val end = getEndTime()
         return Task(
-            date,
-            startTimePicker.time,
-            getEndTime(),
+            start,
+            end,
             taskDescriptionView.text.toString(),
             (thumbnail.drawable as ColorDrawable).color)
     }
+
+    private fun getStartTime(): LocalDateTime
+        = LocalDateTime.of(startDateText.text.toString().toLocalDate(), startTimePicker.time)
+
+    // 마침시간 체크 여부에 따라 null을 주거나 endTimePicker의 값을 줌
+    private fun getEndTime(): LocalDateTime?
+        = if (endTimeContainer.visibility == View.VISIBLE)
+        LocalDateTime.of(endDateText.text.toString().toLocalDate(), endTimePicker.time) else null
 
     private fun getUpdatedTaskWithInputs(originalTask: Task): Task
         = createNewTaskFromInputs().also { it.id = originalTask.id }
 
     private fun updateViewsWithTask(task: Task) {
-        val startTime = task.startTime
-        val endTime = task.endTime
+        val start = task.startDateTime
+        val end = task.endDateTime
 
-        startTimePicker.setTime(startTime)
+        startDateText.text = start.toLocalDate().toDisplayFormat(globalViewModel.getTodayValue())
+        startTimePicker.setTime(start.toLocalTime())
 
-        endTimeCheckbox.isChecked = endTime != null
-        if (endTime != null) {
-            endTimePicker.setTime(endTime)
+        endTimeCheckbox.isChecked = end != null
+        if (end != null) {
+            endDateText.text = end.toLocalDate().toDisplayFormat(globalViewModel.getTodayValue())
+            endTimePicker.setTime(end.toLocalTime())
         }
 
         taskDescriptionView.setText(task.desc)

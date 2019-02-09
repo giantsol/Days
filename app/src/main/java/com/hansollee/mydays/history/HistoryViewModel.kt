@@ -61,10 +61,18 @@ class HistoryViewModel(private var today: LocalDate): ViewModel() {
 
         historyLoadingWork = taskDao.getTasksBetweenDates(startDate, endDate)
             .map { tasks ->
-                tasks
-                    .groupBy { it.date }
-                    .map { History(it.key, it.value.sortedWith(compareBy(Task::startTime, Task::endTime))) }
-                    .sortedByDescending { it.date }
+                val result = arrayListOf<History>()
+                var currentDate = endDate
+                while (currentDate >= startDate) {
+                    val tasksThatBelong = tasks.filter { it.belongsToDate(currentDate) }
+                        .sortedWith(compareBy(Task::startDateTime, Task::endDateTime))
+                    if (tasksThatBelong.isNotEmpty()) {
+                        result.add(History(currentDate, tasksThatBelong))
+                    }
+                    currentDate = currentDate.minusDays(1L)
+                }
+
+                result
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

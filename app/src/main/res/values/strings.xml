@@ -4,7 +4,7 @@
     <string name="task_fragment_title">Tasks</string>
     <string name="history_fragment_title">History</string>
 
-    <string name="from_and_to_invalid">End time should be larger than start time!</string>
+    <string name="start_end_time_invalid">End time should be larger than start time!</string>
     <string name="task_description_invalid">Please fill in task description!</string>
 
     <string name="hint_task_description">Write what you did</string>
@@ -32,6 +32,6 @@
     <string name="text_proceeding">Proceeding</string>
 
     <string name="press_again_to_quit">Press again to quit</string>
-    
-    <string name="today_display_format">%1$s (Today)</string>
+
+    <string name="today_text">Today</string>
 </resources>

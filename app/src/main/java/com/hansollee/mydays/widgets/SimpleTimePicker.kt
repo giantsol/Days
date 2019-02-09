@@ -87,7 +87,7 @@ class SimpleTimePicker
     private val amPmPicker: NumberPicker
 
     private val hourOfDay: Int
-        get() = if (isAm()) hourPicker.value else hourPicker.value + 12
+        get() = if (isAm()) hourPicker.value % MAX_HOUR else hourPicker.value % MAX_HOUR + MAX_HOUR
     private val minute: Int
         get() = minutePicker.value
 
@@ -181,7 +181,7 @@ class SimpleTimePicker
 
     // 파라미터로 받은 time 값을 picker들에 보여줌
     fun setTime(time: LocalTime) {
-        hourPicker.value = time.hour % 12
+        hourPicker.value = time.hour % MAX_HOUR
         minutePicker.value = time.minute
         amPmPicker.value = if (time.hour < 12) AM else PM
 
@@ -189,7 +189,7 @@ class SimpleTimePicker
     }
 
     fun setTime(hourOfDay: Int, minute: Int) {
-        hourPicker.value = hourOfDay % 12
+        hourPicker.value = hourOfDay % MAX_HOUR
         minutePicker.value = minute
         amPmPicker.value = if (hourOfDay < 12) AM else PM
 

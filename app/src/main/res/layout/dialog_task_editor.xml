@@ -58,14 +58,29 @@
                     android:gravity="center"
                     android:paddingLeft="4dp"
                     android:paddingStart="4dp"
+                    android:layout_marginBottom="4dp"
                     android:text="@string/start_time_text"
+                    />
+
+                <TextView
+                    android:id="@+id/start_date_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="36dp"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:gravity="center"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:clickable="true"
+                    android:background="@drawable/button_background"
                     />
 
                 <com.hansollee.mydays.widgets.SimpleTimePicker
                     android:id="@+id/start_timepicker"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/task_editor_dialog_timepicker_height"
-                    android:layout_marginTop="4dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="8dp"
                     />
@@ -87,6 +102,7 @@
                     android:clickable="true"
                     android:background="@drawable/button_background"
                     android:minHeight="40dp"
+                    android:layout_marginBottom="4dp"
                     >
 
                     <CheckBox
@@ -110,25 +126,49 @@
 
                 </LinearLayout>
 
-                <com.hansollee.mydays.widgets.SimpleTimePicker
-                    android:id="@+id/end_timepicker"
+                <LinearLayout
+                    android:id="@+id/end_time_container"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_below="@id/end_time_text_container"
-                    android:visibility="gone"
-                    />
+                    android:visibility="invisible"
+                    >
+
+                    <TextView
+                        android:id="@+id/end_date_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="36dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:clickable="true"
+                        android:background="@drawable/button_background"
+                        />
+
+                    <com.hansollee.mydays.widgets.SimpleTimePicker
+                        android:id="@+id/end_timepicker"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="16dp"
+                        />
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/text_proceeding"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="0dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="16dp"
-                    android:layout_below="@id/end_time_text_container"
+                    android:layout_alignTop="@id/end_time_container"
+                    android:layout_alignBottom="@id/end_time_container"
                     android:textColor="@color/grey"
                     android:textSize="16sp"
                     android:gravity="center"

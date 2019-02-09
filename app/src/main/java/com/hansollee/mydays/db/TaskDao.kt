@@ -21,12 +21,15 @@ import org.threeten.bp.LocalDate
 interface TaskDao {
 
     @Query("SELECT task_description, color_int, COUNT(*) AS cnt FROM tasks GROUP BY task_description, color_int ORDER BY cnt desc")
-    fun getAllTaskDescriptions(): Observable<List<TaskPickerItem>>
+    fun getAllTaskPickerItems(): Observable<List<TaskPickerItem>>
 
-    @Query("SELECT * FROM tasks WHERE date LIKE :date ORDER BY from_time ASC, to_time ASC")
+    @Query("SELECT * FROM tasks WHERE (start >= :date AND start < :date + 86400) OR " +
+        "(start < :date AND end > :date) ORDER BY start ASC, end ASC")
     fun getTasksByDate(date: LocalDate): Observable<List<Task>>
 
-    @Query("SELECT * FROM tasks WHERE date BETWEEN :from AND :to")
+    // from, to inclusive
+    @Query("SELECT * FROM tasks WHERE (start >= :from AND start < :to + 86400) OR " +
+        "(start < :from AND end > :from)")
     fun getTasksBetweenDates(from: LocalDate, to: LocalDate): Single<List<Task>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

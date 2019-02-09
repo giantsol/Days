@@ -36,7 +36,7 @@ class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
         val arrowForward: View = view.findViewById(R.id.arrow_forward)
         val dateText: TextView = view.findViewById(R.id.date_text)
         val taskList: RecyclerView = view.findViewById(R.id.task_list)
-        val taskListAdapter = TaskListAdapter(context, this)
+        val taskListAdapter = TaskListAdapter(context, this, tasksViewModel)
         val progressView: View = view.findViewById(R.id.progress_bar)
         val emptyView: View = view.findViewById(R.id.empty_view)
 
@@ -63,7 +63,7 @@ class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
 
         globalViewModel.getToday().observe(this, Observer<LocalDate> { today ->
             if (tasksViewModel.updateTodayValue(today)) {
-                dateText.text = tasksViewModel.getCurrentDate().value.toDisplayFormat(today)
+                dateText.text = tasksViewModel.getCurrentDateValue().toDisplayFormat(today)
             }
         })
 
@@ -87,7 +87,7 @@ class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
                 taskListAdapter.updateItems(tasks)
 
                 if (tasksResult.byUserUpdate) {
-                    historyViewModel.onUserUpdatedTasks(it.getCurrentDate().value, tasks)
+                    historyViewModel.onUserUpdatedTasks(it.getCurrentDateValue(), tasks)
                 }
 
             })

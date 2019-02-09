@@ -1,21 +1,26 @@
 package com.hansollee.mydays.db
 
 import androidx.room.TypeConverter
+import com.hansollee.mydays.LocalDateCompanion
+import com.hansollee.mydays.LocalDateTimeCompanion
+import com.hansollee.mydays.toEpochSecond
 import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalTime
+import org.threeten.bp.LocalDateTime
 
 /**
  * Created by kevin-ee on 2019-02-01.
  */
 
 class Converters {
-    @TypeConverter
-    fun dateToEpoch(localDate: LocalDate): Long = localDate.toEpochDay()
-    @TypeConverter
-    fun epochToDate(epoch: Long): LocalDate = LocalDate.ofEpochDay(epoch)
 
     @TypeConverter
-    fun timeToSeconds(localTime: LocalTime?): Int? = localTime?.toSecondOfDay()
+    fun dateToSeconds(localDate: LocalDate): Long = localDate.toEpochSecond()
     @TypeConverter
-    fun secondsToTime(seconds: Int?): LocalTime? = seconds?.let { LocalTime.ofSecondOfDay(seconds.toLong()) }
+    fun secondsToDate(seconds: Long): LocalDate = LocalDateCompanion.ofEpochSecond(seconds)
+
+    @TypeConverter
+    fun dateTimeToSeconds(dateTime: LocalDateTime?): Long? = dateTime?.toEpochSecond()
+    @TypeConverter
+    fun secondsToDateTime(seconds: Long?): LocalDateTime?
+        = seconds?.let { LocalDateTimeCompanion.ofEpochSecond(seconds) }
 }
