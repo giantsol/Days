@@ -86,6 +86,11 @@ class HistoryViewModel(private var today: LocalDate): ViewModel() {
     // db를 다시 찔러서 업데이트 하는 대신 수동적으로 업데이트 하도록.
     // 기록이 엄청 많이 쌓여있을 경우, 계속 db찌르는건 부담될까봐
     fun onUserUpdatedTasks(date: LocalDate, tasks: List<Task>) {
+        // History에는 오늘 이하로만 보여주도록
+        if (date > today) {
+            return
+        }
+
         val updatedHistory = History(date, tasks)
         val indexToUpdate = allHistoryInternal.binarySearch(updatedHistory, compareByDescending(History::date))
         if (indexToUpdate >= 0 && indexToUpdate < allHistoryInternal.size) {
