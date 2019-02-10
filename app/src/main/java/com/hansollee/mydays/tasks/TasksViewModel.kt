@@ -9,9 +9,12 @@ import com.hansollee.mydays.db.AppDatabase
 import com.hansollee.mydays.db.TaskDao
 import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.models.TaskPickerItem
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import org.threeten.bp.LocalDate
 
 /**
@@ -27,20 +30,18 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
 
     }
 
-    data class TasksResult(val tasks: List<Task>, val byUserUpdate: Boolean)
-
     private val currentDate: MutableLiveData<LocalDate> = MutableLiveData()
-    private lateinit var currentTasks: MutableLiveData<TasksResult>
+    private lateinit var currentTasks: MutableLiveData<List<Task>>
     private val isLoading: MutableLiveData<Boolean> = MutableLiveData()
     private lateinit var allTaskPickerItems: MutableLiveData<List<TaskPickerItem>>
+    private val dateUpdatedByUserEvent = PublishSubject.create<Pair<LocalDate, List<Task>>>()
 
-    private var loadCurrentTasksWork: Disposable? = null
+    private var loadTasksWork: Disposable? = null
     private var loadAllTaskPickerItemsWork: Disposable? = null
 
     private val taskDao: TaskDao = AppDatabase.getInstance().taskDao()
 
-    // 사용자가 update/insert/delete 등을 한 date 값
-    private var dateThatUserModified: LocalDate? = null
+    private var dirtyDatesByUserModify: ArrayList<LocalDate> = ArrayList()
 
     init {
         currentDate.value = today
@@ -73,9 +74,7 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
         taskDao.insertTask(task).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                isLoading.value = true
-                //TODO: 이거 어케할거냐
-//                dateThatUserModified = task.date
+                loadTask(task)
             }
     }
 
@@ -83,8 +82,7 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
         taskDao.updateTask(task).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                isLoading.value = true
-//                dateThatUserModified = task.date
+                loadTask(task)
             }
     }
 
@@ -92,23 +90,42 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
         taskDao.deleteTask(task).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                isLoading.value = true
-//                dateThatUserModified = task.date
+                loadTask(task)
             }
     }
 
-    fun getCurrentTasks(): LiveData<TasksResult> {
+    private fun loadTask(task: Task) {
+        val startDate = task.startDateTime.toLocalDate()
+        val endDate = task.endDateTime?.toLocalDate()
+        if (endDate == null) {
+            dirtyDatesByUserModify.add(startDate)
+        } else {
+            var d = startDate
+            while (d <= endDate) {
+                dirtyDatesByUserModify.add(d)
+                d = d.plusDays(1L)
+            }
+        }
+
+        loadTasksForDate(dirtyDatesByUserModify)
+    }
+
+    // 유저가 선택한 currentDate에 속한 Tasks를 가져옴
+    fun getCurrentTasks(): LiveData<List<Task>> {
         if (!::currentTasks.isInitialized) {
             currentTasks = MutableLiveData()
-            loadTasksForDate(getCurrentDateValue())
+            loadTasksForDate(listOf(getCurrentDateValue()))
         }
 
         return currentTasks
     }
 
-    fun loadTasksForDate(date: LocalDate) {
-        loadCurrentTasksWork?.dispose()
-        loadCurrentTasksWork = taskDao.getTasksByDate(date)
+    fun loadTasksForDate(dates: List<LocalDate>) {
+        loadTasksWork?.dispose()
+        loadTasksWork = Observable.fromIterable(dates)
+            .flatMapSingle { date ->
+                taskDao.getTasksByDate(date).map { Pair(date, it) }.subscribeOn(Schedulers.io())
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _ ->
                 isLoading.value = true
@@ -116,11 +133,27 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
             .doFinally {
                 isLoading.value = false
             }
-            .subscribe { tasks ->
-                currentTasks.value = TasksResult(tasks, dateThatUserModified == date)
-                isLoading.value = false
-                dateThatUserModified = null
+            .subscribe { pairOfDateAndTasks ->
+                val date = pairOfDateAndTasks.first
+                val tasks = pairOfDateAndTasks.second
+
+                if (date == getCurrentDateValue()) {
+                    currentTasks.value = tasks
+                }
+
+                if (date in dirtyDatesByUserModify) {
+                    dispatchDateChangedByUserModify(date, tasks)
+                    dirtyDatesByUserModify.remove(date)
+                }
             }
+    }
+
+    private fun dispatchDateChangedByUserModify(date: LocalDate, tasks: List<Task>) {
+        dateUpdatedByUserEvent.onNext(Pair(date, tasks))
+    }
+
+    fun observeDateUpdatedByUser(): Observable<Pair<LocalDate, List<Task>>> {
+        return dateUpdatedByUserEvent
     }
 
     fun getLoadingStatus(): LiveData<Boolean> {
@@ -155,7 +188,7 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
     }
 
     override fun onCleared() {
-        loadCurrentTasksWork?.dispose()
+        loadTasksWork?.dispose()
         loadAllTaskPickerItemsWork?.dispose()
     }
 }

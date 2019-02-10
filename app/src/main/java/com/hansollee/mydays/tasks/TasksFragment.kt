@@ -15,6 +15,7 @@ import com.hansollee.mydays.R
 import com.hansollee.mydays.history.HistoryViewModel
 import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.toDisplayFormat
+import io.reactivex.disposables.Disposable
 import org.threeten.bp.LocalDate
 
 /**
@@ -22,6 +23,8 @@ import org.threeten.bp.LocalDate
  */
 
 class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
+
+    private var observeDateUpdatedByUserWork: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_task, container, false)
@@ -70,12 +73,10 @@ class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
         tasksViewModel.also {
             it.getCurrentDate().observe(this, Observer<LocalDate> { currentDate ->
                 dateText.text = currentDate.toDisplayFormat(globalViewModel.getTodayValue())
-                tasksViewModel.loadTasksForDate(currentDate)
+                tasksViewModel.loadTasksForDate(listOf(currentDate))
             })
 
-            it.getCurrentTasks().observe(this, Observer<TasksViewModel.TasksResult> { tasksResult ->
-                val tasks = tasksResult.tasks
-
+            it.getCurrentTasks().observe(this, Observer<List<Task>> { tasks ->
                 if (tasks.isEmpty()) {
                     emptyView.visibility = View.VISIBLE
                     taskList.visibility = View.GONE
@@ -86,11 +87,11 @@ class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
 
                 taskListAdapter.updateItems(tasks)
 
-                if (tasksResult.byUserUpdate) {
-                    historyViewModel.onUserUpdatedTasks(it.getCurrentDateValue(), tasks)
-                }
-
             })
+
+            observeDateUpdatedByUserWork = it.observeDateUpdatedByUser().subscribe { pair ->
+                historyViewModel.onUserUpdatedTasks(pair.first, pair.second)
+            }
 
             it.getLoadingStatus().observe(this, Observer<Boolean> { isLoading ->
                 if (isLoading) {
@@ -110,5 +111,11 @@ class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
 
     override fun onItemClick(task: Task) {
         showTaskEditorDialog(task)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        observeDateUpdatedByUserWork?.dispose()
     }
 }

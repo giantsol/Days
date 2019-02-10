@@ -25,7 +25,7 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE (start >= :date AND start < :date + 86400) OR " +
         "(start < :date AND end > :date) ORDER BY start ASC, end ASC")
-    fun getTasksByDate(date: LocalDate): Observable<List<Task>>
+    fun getTasksByDate(date: LocalDate): Single<List<Task>>
 
     // from, to inclusive
     @Query("SELECT * FROM tasks WHERE (start >= :from AND start < :to + 86400) OR " +
