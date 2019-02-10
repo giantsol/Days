@@ -1,6 +1,7 @@
 package com.hansollee.mydays.tasks
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -23,6 +25,7 @@ import com.hansollee.mydays.toast
 import com.hansollee.mydays.widgets.SimpleTimePicker
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
+import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
 
@@ -31,6 +34,7 @@ import org.threeten.bp.LocalTime
  */
 
 class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPickerDialog.Listener {
+
 
     private data class ValidityCheckResult(val isOk: Boolean, val errorMessage: String?)
 
@@ -76,6 +80,14 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
     private lateinit var endTimeCheckbox: CheckBox
     private lateinit var proceedingText: TextView
 
+    private val startDatePickerDialogListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+        startDateText.text = LocalDate.of(year, month, dayOfMonth).toDisplayFormat(globalViewModel.getTodayValue())
+    }
+
+    private val endDatePickerDialogListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+        endDateText.text = LocalDate.of(year, month, dayOfMonth).toDisplayFormat(globalViewModel.getTodayValue())
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
@@ -108,6 +120,13 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
 
         titleView.text = if (originalTask == null) createNewTaskTitle else editTaskTitle
 
+        startDateText.setOnClickListener { v ->
+            val date = (v as TextView).text.toString().toLocalDate()
+            val datePickerDialog = DatePickerDialog(context, R.style.DatePickerDialog, startDatePickerDialogListener,
+                date.year, date.monthValue, date.dayOfMonth)
+            datePickerDialog.show()
+        }
+
         endTimeTextContainer.setOnClickListener { _ ->
             endTimeCheckbox.isChecked = !endTimeCheckbox.isChecked
         }
@@ -120,6 +139,13 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
                 endDateText.text = globalViewModel.getTodayValue().toDisplayFormat(globalViewModel.getTodayValue())
                 endTimePicker.setTime(LocalTime.now())
             }
+        }
+
+        endDateText.setOnClickListener { v ->
+            val date = (v as TextView).text.toString().toLocalDate()
+            val datePickerDialog = DatePickerDialog(context, R.style.DatePickerDialog, endDatePickerDialogListener,
+                date.year, date.monthValue, date.dayOfMonth)
+            datePickerDialog.show()
         }
 
         startTimePicker.setOnTimeChangedListener(object: SimpleTimePicker.OnTimeChangedListener {
@@ -299,5 +325,4 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         super.onSaveInstanceState(outState)
         outState.putInt(KEY_THUMBNAIL_COLOR, currentThumbnailColor)
     }
-
 }

@@ -78,6 +78,8 @@ object LocalDateCompanion {
 
 // LocalTime
 
+private val MAX_LOCALTIME = LocalTime.of(23, 59, 59)
+
 private val timeStringFormatter = DateTimeFormatterBuilder()
     .appendValue(ChronoField.HOUR_OF_DAY, 2)
     .appendLiteral(':')
@@ -110,8 +112,15 @@ fun LocalDateTime.toEndTime(date: LocalDate): LocalTime {
     return if (thisDate == date) {
         this.toLocalTime()
     } else {
-        LocalTime.MAX
+        MAX_LOCALTIME
     }
 }
 
-fun LocalDateTime.toEndTimeDisplayFormat(date: LocalDate): String = toEndTime(date).format(timeStringFormatter)
+fun LocalDateTime.toEndTimeDisplayFormat(date: LocalDate): String {
+    val endTime = this.toEndTime(date)
+    return if (endTime == MAX_LOCALTIME) {
+        "24:00"
+    } else {
+        endTime.format(timeStringFormatter)
+    }
+}

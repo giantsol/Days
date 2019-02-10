@@ -13,4 +13,7 @@
     <style name="ToolbarTitle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="DatePickerDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+    </style>
 </resources>
