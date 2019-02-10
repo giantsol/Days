@@ -1,5 +1,6 @@
 package com.hansollee.mydays.tasks
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.hansollee.mydays.R
 import com.hansollee.mydays.history.HistoryViewModel
 import com.hansollee.mydays.models.Task
 import com.hansollee.mydays.toDisplayFormat
+import com.hansollee.mydays.toLocalDate
 import io.reactivex.disposables.Disposable
 import org.threeten.bp.LocalDate
 
@@ -55,8 +57,14 @@ class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
             tasksViewModel.changeCurrentDate(1)
         }
 
-        dateText.setOnClickListener { _ ->
-            tasksViewModel.resetCurrentDateToToday()
+        dateText.setOnClickListener { v ->
+            val date = (v as TextView).text.toString().toLocalDate()
+            val datePickerDialog = DatePickerDialog(context, R.style.DatePickerDialog,
+                DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+                    tasksViewModel.setCurrentDate(LocalDate.of(year, month, dayOfMonth))
+                },
+                date.year, date.monthValue, date.dayOfMonth)
+            datePickerDialog.show()
         }
 
         taskList.also {

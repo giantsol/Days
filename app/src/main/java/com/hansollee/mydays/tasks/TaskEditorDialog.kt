@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -34,7 +33,6 @@ import org.threeten.bp.LocalTime
  */
 
 class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPickerDialog.Listener {
-
 
     private data class ValidityCheckResult(val isOk: Boolean, val errorMessage: String?)
 
