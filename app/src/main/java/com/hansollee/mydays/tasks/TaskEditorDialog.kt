@@ -79,11 +79,11 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
     private lateinit var proceedingText: TextView
 
     private val startDatePickerDialogListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-        startDateText.text = LocalDate.of(year, month, dayOfMonth).toDisplayFormat(globalViewModel.getTodayValue())
+        startDateText.text = LocalDate.of(year, month + 1, dayOfMonth).toDisplayFormat(globalViewModel.getTodayValue())
     }
 
     private val endDatePickerDialogListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-        endDateText.text = LocalDate.of(year, month, dayOfMonth).toDisplayFormat(globalViewModel.getTodayValue())
+        endDateText.text = LocalDate.of(year, month + 1, dayOfMonth).toDisplayFormat(globalViewModel.getTodayValue())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -121,7 +121,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         startDateText.setOnClickListener { v ->
             val date = (v as TextView).text.toString().toLocalDate()
             val datePickerDialog = DatePickerDialog(context, R.style.DatePickerDialog, startDatePickerDialogListener,
-                date.year, date.monthValue, date.dayOfMonth)
+                date.year, date.monthValue - 1, date.dayOfMonth)
             datePickerDialog.show()
         }
 
@@ -142,7 +142,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         endDateText.setOnClickListener { v ->
             val date = (v as TextView).text.toString().toLocalDate()
             val datePickerDialog = DatePickerDialog(context, R.style.DatePickerDialog, endDatePickerDialogListener,
-                date.year, date.monthValue, date.dayOfMonth)
+                date.year, date.monthValue - 1, date.dayOfMonth)
             datePickerDialog.show()
         }
 

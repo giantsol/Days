@@ -61,9 +61,9 @@ class TasksFragment: Fragment(), TaskListAdapter.ItemClickListener {
             val date = (v as TextView).text.toString().toLocalDate()
             val datePickerDialog = DatePickerDialog(context, R.style.DatePickerDialog,
                 DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                    tasksViewModel.setCurrentDate(LocalDate.of(year, month, dayOfMonth))
+                    tasksViewModel.setCurrentDate(LocalDate.of(year, month + 1, dayOfMonth))
                 },
-                date.year, date.monthValue, date.dayOfMonth)
+                date.year, date.monthValue - 1, date.dayOfMonth)
             datePickerDialog.show()
         }
 
