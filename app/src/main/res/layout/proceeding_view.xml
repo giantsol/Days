@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.hansollee.mydays.widgets.HeightMatchAspectRatioImageView
+        android:id="@+id/icon1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_proceeding_accent_24dp"
+        android:visibility="invisible"
+        />
+    <com.hansollee.mydays.widgets.HeightMatchAspectRatioImageView
+        android:id="@+id/icon2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_proceeding_accent_24dp"
+        android:layout_marginLeft="-4dp"
+        android:layout_marginStart="-4dp"
+        android:visibility="invisible"
+        />
+    <com.hansollee.mydays.widgets.HeightMatchAspectRatioImageView
+        android:id="@+id/icon3"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_proceeding_accent_24dp"
+        android:layout_marginLeft="-4dp"
+        android:layout_marginStart="-4dp"
+        android:visibility="invisible"
+        />
+
+</merge>

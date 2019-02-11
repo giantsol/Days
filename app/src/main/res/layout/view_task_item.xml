@@ -29,10 +29,9 @@
             android:src="@color/default_task_thumbnail_color"
             />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginLeft="@dimen/task_item_content_margin_left"
             android:layout_marginStart="@dimen/task_item_content_margin_left"
             >
@@ -43,6 +42,21 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/task_item_time_range_textsize"
                 android:textColor="@color/grey"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                />
+
+            <com.hansollee.mydays.widgets.ProceedingView
+                android:id="@+id/proceeding_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_alignTop="@id/time_range"
+                android:layout_alignBottom="@id/time_range"
+                android:layout_toRightOf="@id/time_range"
+                android:layout_toEndOf="@id/time_range"
+                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 />
 
             <TextView
@@ -52,9 +66,10 @@
                 android:textSize="@dimen/task_item_task_desc_textsize"
                 android:textColor="@android:color/black"
                 android:layout_marginTop="@dimen/task_item_time_desc_spacing"
+                android:layout_below="@id/time_range"
                 />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 

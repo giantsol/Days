@@ -59,6 +59,7 @@ class TaskListAdapter(context: Context,
         private val thumbnail: ImageView = view.findViewById(R.id.thumbnail)
         private val timeRange: TextView = view.findViewById(R.id.time_range)
         private val taskDescription: TextView = view.findViewById(R.id.task_description)
+        private val proceedingView: View = view.findViewById(R.id.proceeding_view)
 
         fun bind(task: Task, itemClickListener: ItemClickListener, tasksViewModel: TasksViewModel) {
             val currentDate = tasksViewModel.getCurrentDateValue()
@@ -71,6 +72,12 @@ class TaskListAdapter(context: Context,
                 if (task.endDateTime == null) PROCEEDING_TEXT else task.endDateTime.toEndTimeDisplayFormat(currentDate)
             )
             taskDescription.text = task.desc
+
+            if (task.endDateTime == null) {
+                proceedingView.visibility = View.VISIBLE
+            } else {
+                proceedingView.visibility = View.INVISIBLE
+            }
 
             contentContainer.setOnClickListener { _ ->
                 itemClickListener.onItemClick(task)
