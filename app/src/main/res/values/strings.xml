@@ -34,4 +34,7 @@
     <string name="press_again_to_quit">Press again to quit</string>
 
     <string name="today_text">Today</string>
+
+    <string name="confirm_edit_format">Commit task \"%3$s\" from %1$s to %2$s?</string>
+    <string name="confirm_delete">Are you sure to remove this task?</string>
 </resources>

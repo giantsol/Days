@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="DatePickerDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
-        <item name="android:colorAccent">@color/colorPrimary</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="colorControlActivated">?attr/colorPrimary</item>
+        <item name="alertDialogTheme">@style/AlertDialog</item>
+        <item name="android:datePickerDialogTheme">@style/DatePickerDialog</item>
+    </style>
+
+    <style name="AlertDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/AlertDialogPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AlertDialogNegativeButtonStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/AlertDialogPositiveButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/AlertDialogNegativeButtonStyle</item>
         <item name="android:colorControlActivated">@color/colorAccent</item>
+    </style>
+
+    <style name="DatePickerDialog" parent="AlertDialog">
+        <item name="android:datePickerStyle">@style/DatePicker</item>
+    </style>
+
+    <style name="DatePicker" parent="@android:style/Widget.Material.Light.DatePicker">
+        <item name="android:headerBackground">@color/colorPrimary</item>
     </style>
 
 </resources>

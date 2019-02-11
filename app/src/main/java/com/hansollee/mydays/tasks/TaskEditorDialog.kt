@@ -7,12 +7,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
@@ -115,12 +117,14 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         taskDescriptionInvalidMsg = res.getString(R.string.task_description_invalid)
         val createNewTaskTitle = res.getString(R.string.create_new_task_title)
         val editTaskTitle = res.getString(R.string.edit_task_title)
+        val confirmEditFormat = res.getString(R.string.confirm_edit_format)
+        val confirmDelete = res.getString(R.string.confirm_delete)
 
         titleView.text = if (originalTask == null) createNewTaskTitle else editTaskTitle
 
         startDateText.setOnClickListener { v ->
             val date = (v as TextView).text.toString().toLocalDate()
-            val datePickerDialog = DatePickerDialog(context, R.style.DatePickerDialog, startDatePickerDialogListener,
+            val datePickerDialog = DatePickerDialog(context, startDatePickerDialogListener,
                 date.year, date.monthValue - 1, date.dayOfMonth)
             datePickerDialog.show()
         }
@@ -141,7 +145,7 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
 
         endDateText.setOnClickListener { v ->
             val date = (v as TextView).text.toString().toLocalDate()
-            val datePickerDialog = DatePickerDialog(context, R.style.DatePickerDialog, endDatePickerDialogListener,
+            val datePickerDialog = DatePickerDialog(context, endDatePickerDialogListener,
                 date.year, date.monthValue - 1, date.dayOfMonth)
             datePickerDialog.show()
         }
@@ -190,8 +194,18 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         if (originalTask != null) {
             deleteButton.visibility = View.VISIBLE
             deleteButton.setOnClickListener { _ ->
-                tasksViewModel.deleteTask(originalTask!!)
-                dismiss()
+                AlertDialog.Builder(context)
+                    .setMessage(confirmDelete)
+                    .setPositiveButton(okButton.text) { _, _ ->
+                        tasksViewModel.deleteTask(originalTask!!)
+                        dismiss()
+                    }
+                    .setNegativeButton(cancelButton.text, null)
+                    .create().apply {
+                        requestWindowFeature(Window.FEATURE_NO_TITLE)
+                        setCanceledOnTouchOutside(false)
+                    }
+                    .show()
             }
         } else {
             deleteButton.visibility = View.GONE
@@ -202,12 +216,30 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
             // 우선 input들이 모두 valid한지 체크
             val validityCheckResult = getValidityCheckResult()
             if (validityCheckResult.isOk) {
-                if (originalTask == null) {
-                    tasksViewModel.insertNewTask(createNewTaskFromInputs())
+                val start = getStartDateTime()
+                val end = getEndDateTime()
+                val message = if (end == null) {
+                    String.format(confirmEditFormat, start.toDisplayFormat(), proceedingText.text, taskDescriptionView.text.toString())
                 } else {
-                    tasksViewModel.updateTask(getUpdatedTaskWithInputs(originalTask!!))
+                    String.format(confirmEditFormat, start.toDisplayFormat(), end.toDisplayFormat(), taskDescriptionView.text.toString())
                 }
-                dismiss()
+
+                AlertDialog.Builder(context)
+                    .setMessage(message)
+                    .setPositiveButton(okButton.text) { _, _ ->
+                        if (originalTask == null) {
+                            tasksViewModel.insertNewTask(createNewTaskFromInputs())
+                        } else {
+                            tasksViewModel.updateTask(getUpdatedTaskWithInputs(originalTask!!))
+                        }
+                        dismiss()
+                    }
+                    .setNegativeButton(cancelButton.text, null)
+                    .create().apply {
+                        requestWindowFeature(Window.FEATURE_NO_TITLE)
+                        setCanceledOnTouchOutside(false)
+                    }
+                    .show()
             } else {
                 toast(validityCheckResult.errorMessage)
             }
@@ -238,8 +270,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
     }
 
     private fun getValidityCheckResult(): ValidityCheckResult {
-        val start = getStartTime()
-        val end = getEndTime()
+        val start = getStartDateTime()
+        val end = getEndDateTime()
         if (end != null && start > end) {
             return ValidityCheckResult(false, startEndInvalidMsg)
         }
@@ -252,8 +284,8 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
     }
 
     private fun createNewTaskFromInputs(): Task {
-        val start = getStartTime()
-        val end = getEndTime()
+        val start = getStartDateTime()
+        val end = getEndDateTime()
         return Task(
             start,
             end,
@@ -261,11 +293,10 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
             (thumbnail.drawable as ColorDrawable).color)
     }
 
-    private fun getStartTime(): LocalDateTime
+    private fun getStartDateTime(): LocalDateTime
         = LocalDateTime.of(startDateText.text.toString().toLocalDate(), startTimePicker.time)
 
-    // 마침시간 체크 여부에 따라 null을 주거나 endTimePicker의 값을 줌
-    private fun getEndTime(): LocalDateTime?
+    private fun getEndDateTime(): LocalDateTime?
         = if (endTimeContainer.visibility == View.VISIBLE)
         LocalDateTime.of(endDateText.text.toString().toLocalDate(), endTimePicker.time) else null
 

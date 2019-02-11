@@ -8,12 +8,24 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:includeFontPadding">false</item>
         <item name="colorControlActivated">?attr/colorPrimary</item>
+        <item name="alertDialogTheme">@style/AlertDialog</item>
     </style>
 
     <style name="ToolbarTitle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="DatePickerDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+    <style name="AlertDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/AlertDialogPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AlertDialogNegativeButtonStyle</item>
     </style>
+    
+    <style name="AlertDialogPositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="AlertDialogNegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
 </resources>

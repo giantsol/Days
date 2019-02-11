@@ -4,7 +4,7 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import org.threeten.bp.format.SignStyle
 import org.threeten.bp.format.TextStyle
@@ -90,6 +90,15 @@ fun LocalTime.toMinuteOfDay(): Int = hour * MINUTES_PER_HOUR + minute
 
 // LocalDateTime
 
+private val dateTimeStringFormatter = DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .append(DateTimeFormatter.ISO_LOCAL_DATE)
+    .appendLiteral(' ')
+    .appendValue(ChronoField.HOUR_OF_DAY, 2)
+    .appendLiteral(':')
+    .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+    .toFormatter()
+
 fun LocalDateTime.toEpochSecond(): Long = this.toEpochSecond(zoneOffset)
 
 object LocalDateTimeCompanion {
@@ -124,3 +133,5 @@ fun LocalDateTime.toEndTimeDisplayFormat(date: LocalDate): String {
         endTime.format(timeStringFormatter)
     }
 }
+
+fun LocalDateTime.toDisplayFormat(): String = this.format(dateTimeStringFormatter)
