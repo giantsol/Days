@@ -8,12 +8,11 @@ import androidx.lifecycle.ViewModelProviders
 import com.hansollee.mydays.db.AppDatabase
 import com.hansollee.mydays.db.TaskDao
 import com.hansollee.mydays.models.Task
-import com.hansollee.mydays.models.TaskPickerItem
+import com.hansollee.mydays.models.UniqueTask
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import org.threeten.bp.LocalDate
 
@@ -33,11 +32,11 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
     private val currentDate: MutableLiveData<LocalDate> = MutableLiveData()
     private lateinit var currentTasks: MutableLiveData<List<Task>>
     private val isLoading: MutableLiveData<Boolean> = MutableLiveData()
-    private lateinit var allTaskPickerItems: MutableLiveData<List<TaskPickerItem>>
+    private lateinit var allUniqueTasks: MutableLiveData<List<UniqueTask>>
     private val dateUpdatedByUserEvent = PublishSubject.create<Pair<LocalDate, List<Task>>>()
 
     private var loadTasksWork: Disposable? = null
-    private var loadAllTaskPickerItemsWork: Disposable? = null
+    private var loadAllUniqueTasksWork: Disposable? = null
 
     private val taskDao: TaskDao = AppDatabase.getInstance().taskDao()
 
@@ -160,21 +159,21 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
         return isLoading
     }
 
-    fun getAllTaskPickerItems(): LiveData<List<TaskPickerItem>> {
-        if (!::allTaskPickerItems.isInitialized) {
-            allTaskPickerItems = MutableLiveData()
-            loadAllTaskPickerItems()
+    fun getAllUniqueTasks(): LiveData<List<UniqueTask>> {
+        if (!::allUniqueTasks.isInitialized) {
+            allUniqueTasks = MutableLiveData()
+            loadAllUniqueTasks()
         }
 
-        return allTaskPickerItems
+        return allUniqueTasks
     }
 
-    private fun loadAllTaskPickerItems() {
-        loadAllTaskPickerItemsWork?.dispose()
-        loadAllTaskPickerItemsWork = taskDao.getAllTaskPickerItems()
+    private fun loadAllUniqueTasks() {
+        loadAllUniqueTasksWork?.dispose()
+        loadAllUniqueTasksWork = taskDao.getAllUniqueTasks()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ tasks ->
-                allTaskPickerItems.value = tasks
+                allUniqueTasks.value = tasks
             })
     }
 
@@ -189,6 +188,6 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
 
     override fun onCleared() {
         loadTasksWork?.dispose()
-        loadAllTaskPickerItemsWork?.dispose()
+        loadAllUniqueTasksWork?.dispose()
     }
 }

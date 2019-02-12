@@ -10,7 +10,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.hansollee.mydays.R
-import com.hansollee.mydays.models.Task
 
 /**
  * Created by kevin-ee on 2019-02-11.
@@ -36,9 +35,9 @@ class CategoryView
         taskDescription = view.findViewById(R.id.task_description)
     }
 
-    fun showTask(task: Task) {
-        (thumbnail.drawable.mutate() as ColorDrawable).color = task.colorInt
-        taskDescription.text = task.desc
+    fun update(thumbnailColor: Int, description: String, durationString: String) {
+        (thumbnail.drawable.mutate() as ColorDrawable).color = thumbnailColor
+        taskDescription.text = "$description ($durationString)"
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

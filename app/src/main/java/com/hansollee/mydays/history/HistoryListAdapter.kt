@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
+import com.hansollee.mydays.getTotalDurationString
 import com.hansollee.mydays.models.History
 import com.hansollee.mydays.toDisplayFormat
 import com.hansollee.mydays.widgets.CategoryView
@@ -36,7 +37,7 @@ class HistoryListAdapter(context: Context,
     }
 
     override fun getItemViewType(position: Int): Int {
-        return items[position].uniqueDescTasks.size
+        return items[position].tasksGroupedByUnique.size
     }
 
     override fun getItemCount(): Int = items.size
@@ -76,10 +77,13 @@ class HistoryListAdapter(context: Context,
             graph.setDefaultColor(defGraphColor)
             graph.drawHistory(history)
 
-            val uniqueDescTasks = history.uniqueDescTasks
-            for (i in 0.until(uniqueDescTasks.size)) {
-                val category = categoriesContainer.getChildAt(i) as CategoryView
-                category.showTask(uniqueDescTasks[i])
+            val groupedTasks = history.tasksGroupedByUnique
+            val uniqueTasks = groupedTasks.keys
+            for (i in 0.until(uniqueTasks.size)) {
+                val categoryView = categoriesContainer.getChildAt(i) as CategoryView
+                val uniqueTask = uniqueTasks.elementAt(i)
+                val totalDurationOfUniqueTask: String = groupedTasks[uniqueTask]!!.getTotalDurationString(history.date)
+                categoryView.update(uniqueTask.colorInt, uniqueTask.desc, totalDurationOfUniqueTask)
             }
 
             contentContainer.setOnClickListener { _ ->

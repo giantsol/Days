@@ -19,7 +19,7 @@ import androidx.fragment.app.DialogFragment
 import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Task
-import com.hansollee.mydays.models.TaskPickerItem
+import com.hansollee.mydays.models.UniqueTask
 import com.hansollee.mydays.toDisplayFormat
 import com.hansollee.mydays.toLocalDate
 import com.hansollee.mydays.toast
@@ -339,9 +339,9 @@ class TaskEditorDialog : DialogFragment(), ColorPickerDialogListener, TaskPicker
         (thumbnail.drawable.mutate() as ColorDrawable).color = color
     }
 
-    override fun onTaskPicked(taskPickerItem: TaskPickerItem) {
-        taskDescriptionView.setText(taskPickerItem.desc)
-        updateThumbnailColor(taskPickerItem.colorInt)
+    override fun onTaskPicked(uniqueTask: UniqueTask) {
+        taskDescriptionView.setText(uniqueTask.desc)
+        updateThumbnailColor(uniqueTask.colorInt)
     }
 
     private fun hideKeyboardIfShown() {

@@ -8,5 +8,5 @@ import org.threeten.bp.LocalDate
 
 data class History(val date: LocalDate,
                    val tasks: List<Task>) {
-    val uniqueDescTasks = tasks.distinctBy { it.desc }
+    val tasksGroupedByUnique = tasks.groupBy { UniqueTask(it.desc, it.colorInt) }
 }

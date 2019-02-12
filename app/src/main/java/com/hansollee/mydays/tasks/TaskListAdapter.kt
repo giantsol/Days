@@ -9,8 +9,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hansollee.mydays.R
-import com.hansollee.mydays.appContext
 import com.hansollee.mydays.models.Task
+import com.hansollee.mydays.proceedingText
 import com.hansollee.mydays.toEndTimeDisplayFormat
 import com.hansollee.mydays.toStartTimeDisplayFormat
 
@@ -52,7 +52,6 @@ class TaskListAdapter(context: Context,
                 = ItemViewHolder(inflater.inflate(R.layout.view_task_item, parent, false))
 
             private const val TIME_RANGE_FORMAT = "%s - %s"
-            private val PROCEEDING_TEXT = appContext?.getString(R.string.text_proceeding) ?: "Proceeding"
         }
 
         private val contentContainer: View = view.findViewById(R.id.content_container)
@@ -69,7 +68,7 @@ class TaskListAdapter(context: Context,
             timeRange.text = String.format(
                 TIME_RANGE_FORMAT,
                 task.startDateTime.toStartTimeDisplayFormat(currentDate),
-                if (task.endDateTime == null) PROCEEDING_TEXT else task.endDateTime.toEndTimeDisplayFormat(currentDate)
+                if (task.endDateTime == null) proceedingText else task.endDateTime.toEndTimeDisplayFormat(currentDate)
             )
             taskDescription.text = task.desc
 

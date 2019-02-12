@@ -1,5 +1,6 @@
 package com.hansollee.mydays
 
+import com.hansollee.mydays.models.Task
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
@@ -19,6 +20,10 @@ private val MINUTES_PER_HOUR = 60
 
 private val todayText by lazy {
     appContext!!.resources.getString(R.string.today_text)
+}
+
+val proceedingText by lazy {
+    appContext!!.getString(R.string.text_proceeding)
 }
 
 private val zoneOffset by lazy {
@@ -80,13 +85,28 @@ object LocalDateCompanion {
 
 private val MAX_LOCALTIME = LocalTime.of(23, 59, 59)
 
+private val hoursText by lazy {
+    appContext!!.resources.getString(R.string.hours_text)
+}
+
+private val minutesText by lazy {
+    appContext!!.resources.getString(R.string.minutes_text)
+}
+
 private val timeStringFormatter = DateTimeFormatterBuilder()
     .appendValue(ChronoField.HOUR_OF_DAY, 2)
     .appendLiteral(':')
     .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
     .toFormatter()
 
-fun LocalTime.toMinuteOfDay(): Int = hour * MINUTES_PER_HOUR + minute
+private val durationStringFormatter = DateTimeFormatterBuilder()
+    .appendValue(ChronoField.HOUR_OF_DAY)
+    .appendLiteral("$hoursText ")
+    .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+    .appendLiteral(minutesText)
+    .toFormatter()
+
+fun LocalTime.toMinuteOfDay(): Int = if (this == MAX_LOCALTIME) 24 * MINUTES_PER_HOUR else hour * MINUTES_PER_HOUR + minute
 
 // LocalDateTime
 
@@ -135,3 +155,26 @@ fun LocalDateTime.toEndTimeDisplayFormat(date: LocalDate): String {
 }
 
 fun LocalDateTime.toDisplayFormat(): String = this.format(dateTimeStringFormatter)
+
+fun List<Task>.getTotalDurationString(date: LocalDate): String {
+    var totalMinutes = 0L
+    var hasProceedingTask = false
+    for (task in this) {
+        val startTime = task.startDateTime.toStartTime(date)
+        val endTime = task.endDateTime?.toEndTime(date)
+
+        if (endTime != null) {
+            totalMinutes += endTime.toMinuteOfDay() - startTime.toMinuteOfDay()
+        } else {
+            hasProceedingTask = true
+        }
+    }
+
+    val durationString = LocalTime.of((totalMinutes / MINUTES_PER_HOUR).toInt(), (totalMinutes % MINUTES_PER_HOUR).toInt()).format(durationStringFormatter)
+    return if (!hasProceedingTask) {
+        durationString
+    } else {
+        "$durationString + $proceedingText"
+    }
+
+}

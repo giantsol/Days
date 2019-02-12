@@ -37,4 +37,7 @@
 
     <string name="confirm_edit_format">%1$s 부터 %2$s 까지 \"%3$s\" 작업을 등록하시겠습니까?</string>
     <string name="confirm_delete">해당 작업을 삭제하시겠습니까?</string>
+
+    <string name="hours_text">시간</string>
+    <string name="minutes_text">분</string>
 </resources>

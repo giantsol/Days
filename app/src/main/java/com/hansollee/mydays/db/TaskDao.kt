@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.hansollee.mydays.models.Task
-import com.hansollee.mydays.models.TaskPickerItem
+import com.hansollee.mydays.models.UniqueTask
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -21,7 +21,7 @@ import org.threeten.bp.LocalDate
 interface TaskDao {
 
     @Query("SELECT task_description, color_int, COUNT(*) AS cnt FROM tasks GROUP BY task_description, color_int ORDER BY cnt desc")
-    fun getAllTaskPickerItems(): Observable<List<TaskPickerItem>>
+    fun getAllUniqueTasks(): Observable<List<UniqueTask>>
 
     @Query("SELECT * FROM tasks WHERE (start >= :date AND start < :date + 86400) OR " +
         "(start < :date AND end > :date) ORDER BY start ASC, end ASC")

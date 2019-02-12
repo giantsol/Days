@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
-import com.hansollee.mydays.models.TaskPickerItem
+import com.hansollee.mydays.models.UniqueTask
 
 /**
  * Created by kevin-ee on 2019-02-06.
@@ -19,7 +19,7 @@ import com.hansollee.mydays.models.TaskPickerItem
 class TaskPickerDialog : DialogFragment(), TaskPickerListAdapter.ItemClickListener {
 
     interface Listener {
-        fun onTaskPicked(taskPickerItem: TaskPickerItem)
+        fun onTaskPicked(uniqueTask: UniqueTask)
     }
 
     private var listener: Listener? = null
@@ -35,7 +35,7 @@ class TaskPickerDialog : DialogFragment(), TaskPickerListAdapter.ItemClickListen
         taskRecyclerview.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         taskRecyclerview.adapter = adapter
 
-        tasksViewModel.getAllTaskPickerItems().observe(this, Observer<List<TaskPickerItem>> { items ->
+        tasksViewModel.getAllUniqueTasks().observe(this, Observer<List<UniqueTask>> { items ->
             loadingView.visibility = View.GONE
 
             if (items.isEmpty()) {
@@ -64,8 +64,8 @@ class TaskPickerDialog : DialogFragment(), TaskPickerListAdapter.ItemClickListen
         this.listener = listener
     }
 
-    override fun onItemClick(taskPickerItem: TaskPickerItem) {
-        listener?.onTaskPicked(taskPickerItem)
+    override fun onItemClick(uniqueTask: UniqueTask) {
+        listener?.onTaskPicked(uniqueTask)
         dismiss()
     }
 
