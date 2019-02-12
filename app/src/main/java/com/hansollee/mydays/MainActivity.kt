@@ -11,8 +11,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
+import com.hansollee.mydays.tasks.TasksViewModel
 
 class MainActivity : AppCompatActivity(), BackKeyDispatcher {
 
@@ -39,12 +41,14 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         setContentView(R.layout.activity_main)
 
         globalViewModel = GlobalViewModel.getInstance(this)
+        val tasksViewModel = TasksViewModel.getInstance(this, globalViewModel.getTodayValue())
         val tabLayout: TabLayout = findViewById(R.id.tablayout)
         viewPager = findViewById(R.id.viewpager)
         val tabAdapter = MainTabAdapter(supportFragmentManager)
         val menuButton: View = findViewById(R.id.menu_button)
         val drawer: DrawerLayout = findViewById(R.id.drawer)
         val miniMyDaysButton: View = findViewById(R.id.mini_mydays_button)
+        val loadingView: View = findViewById(R.id.loading_view)
         pressAgainToQuitMsg = getString(R.string.press_again_to_quit)
 
         viewPager.adapter = tabAdapter
@@ -55,7 +59,7 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         )
 
         menuButton.setOnClickListener { _ ->
-            if (!drawer.isDrawerOpen(DRAWER_GRAVITY)) {
+            if (loadingView.visibility != View.VISIBLE && !drawer.isDrawerOpen(DRAWER_GRAVITY)) {
                 drawer.openDrawer(DRAWER_GRAVITY)
             }
         }
@@ -68,6 +72,14 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
                 startFloatingWidgetService()
             }
         }
+
+        tasksViewModel.getLoadingStatus().observe(this, Observer<Boolean> { isLoading ->
+            if (isLoading) {
+                loadingView.visibility = View.VISIBLE
+            } else {
+                loadingView.visibility = View.GONE
+            }
+        })
     }
 
     private fun startFloatingWidgetService() {

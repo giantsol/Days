@@ -1,5 +1,6 @@
 package com.hansollee.mydays.tasks
 
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -121,10 +122,11 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
 
     fun loadTasksForDate(dates: List<LocalDate>) {
         loadTasksWork?.dispose()
-        loadTasksWork = Observable.fromIterable(dates)
+        loadTasksWork = Observable.fromIterable(dates.toList())
             .flatMapSingle { date ->
-                taskDao.getTasksByDate(date).map { Pair(date, it) }.subscribeOn(Schedulers.io())
+                taskDao.getTasksByDate(date).map { Pair(date, it) }
             }
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _ ->
                 isLoading.value = true
@@ -132,7 +134,7 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
             .doFinally {
                 isLoading.value = false
             }
-            .subscribe { pairOfDateAndTasks ->
+            .subscribe ({ pairOfDateAndTasks ->
                 val date = pairOfDateAndTasks.first
                 val tasks = pairOfDateAndTasks.second
 
@@ -144,7 +146,7 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
                     dispatchDateChangedByUserModify(date, tasks)
                     dirtyDatesByUserModify.remove(date)
                 }
-            }
+            })
     }
 
     private fun dispatchDateChangedByUserModify(date: LocalDate, tasks: List<Task>) {

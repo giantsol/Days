@@ -170,11 +170,12 @@ fun List<Task>.getTotalDurationString(date: LocalDate): String {
         }
     }
 
-    val durationString = LocalTime.of((totalMinutes / MINUTES_PER_HOUR).toInt(), (totalMinutes % MINUTES_PER_HOUR).toInt()).format(durationStringFormatter)
+    val hours = totalMinutes / MINUTES_PER_HOUR
+    val minutes = totalMinutes % MINUTES_PER_HOUR
     return if (!hasProceedingTask) {
-        durationString
+        "$hours$hoursText $minutes$minutesText"
     } else {
-        "$durationString + $proceedingText"
+        "$hours$hoursText $minutes$minutesText + $proceedingText"
     }
 
 }
