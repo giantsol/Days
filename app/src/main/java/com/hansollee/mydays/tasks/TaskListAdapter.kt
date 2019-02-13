@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.hansollee.mydays.R
 import com.hansollee.mydays.models.Task
@@ -29,6 +30,20 @@ class TaskListAdapter(context: Context,
     private val inflater = LayoutInflater.from(context)
     private val items: ArrayList<Task> = ArrayList()
 
+    class DiffCallback(val oldList: List<Task>, val newList: List<Task>): DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean
+            = oldList[oldItemPosition].id == newList[newItemPosition].id
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean
+            = oldList[oldItemPosition] == newList[newItemPosition]
+
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ItemViewHolder {
         return ItemViewHolder.create(inflater, parent)
     }
@@ -40,9 +55,11 @@ class TaskListAdapter(context: Context,
     }
 
     fun updateItems(tasks: List<Task>) {
+        val diffResult = DiffUtil.calculateDiff(DiffCallback(items, tasks))
+        diffResult.dispatchUpdatesTo(this)
+
         items.clear()
         items.addAll(tasks)
-        notifyDataSetChanged()
     }
 
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {

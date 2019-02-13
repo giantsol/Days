@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.hansollee.mydays.GlobalViewModel
 import com.hansollee.mydays.R
@@ -32,6 +33,20 @@ class HistoryListAdapter(context: Context,
     private val items: ArrayList<History> = ArrayList()
     @ColorInt private val defaultGraphColor = ContextCompat.getColor(context, R.color.default_history_graph_color)
 
+    class DiffCallback(val oldList: List<History>, val newList: List<History>): DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean
+            = oldList[oldItemPosition].date == newList[newItemPosition].date
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean
+            = oldList[oldItemPosition] == newList[newItemPosition]
+
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ItemViewHolder {
         return ItemViewHolder.create(inflater, parent, viewType)
     }
@@ -47,9 +62,11 @@ class HistoryListAdapter(context: Context,
     }
 
     fun updateItems(items: List<History>) {
+        val diffResult = DiffUtil.calculateDiff(DiffCallback(this.items, items))
+        diffResult.dispatchUpdatesTo(this)
+
         this.items.clear()
         this.items.addAll(items)
-        notifyDataSetChanged()
     }
 
     class ItemViewHolder(view: View, private val categoryCount: Int) : RecyclerView.ViewHolder(view) {
