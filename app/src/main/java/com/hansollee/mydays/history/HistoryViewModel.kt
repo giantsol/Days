@@ -33,7 +33,6 @@ class HistoryViewModel(private var today: LocalDate): ViewModel() {
     private lateinit var allHistory: MutableLiveData<List<History>>
     private val allHistoryInternal: ArrayList<History> = ArrayList()
 
-    private var pagingEndDate = today
     // 한번 새로 요청할때마다 몇개씩 요청할건지
     private val pagingValue = 10L
 
@@ -41,6 +40,12 @@ class HistoryViewModel(private var today: LocalDate): ViewModel() {
 
     private val isLoading: Boolean
         get() = historyLoadingWork?.isDisposed == false
+
+    private val hasMoreItems: MutableLiveData<Boolean> = MutableLiveData()
+
+    init {
+        hasMoreItems.value = true
+    }
 
     fun getAllHistory(): LiveData<List<History>> {
         if (!::allHistory.isInitialized) {
@@ -50,14 +55,14 @@ class HistoryViewModel(private var today: LocalDate): ViewModel() {
         return allHistory
     }
 
-    // startDate ~ endDate 사이에 있는 Task들을 가져와서 allHistory에 append시킴
-    private fun loadNextHistory() {
+    fun loadNextHistory() {
         if (isLoading) {
             return
         }
 
-        val startDate = pagingEndDate.minusDays(pagingValue)
-        val endDate = pagingEndDate
+        val lastLoadedHistoryDate = allHistoryInternal.lastOrNull()?.date
+        val endDate = lastLoadedHistoryDate?.minusDays(1L) ?: today
+        val startDate = endDate.minusDays(pagingValue)
 
         historyLoadingWork = taskDao.getTasksBetweenDates(startDate, endDate)
             .map { tasks ->
@@ -77,14 +82,10 @@ class HistoryViewModel(private var today: LocalDate): ViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe ({ histories ->
-                if (histories.isEmpty()) {
-                    // TODO: 더이상 남아있는 히스토리가 없다고 알려줘야함
-                } else {
-                    allHistoryInternal.addAll(histories)
-                    allHistory.value = allHistoryInternal
+                allHistoryInternal.addAll(histories)
+                allHistory.value = allHistoryInternal
 
-                    pagingEndDate = histories.last().date.minusDays(1L)
-                }
+                hasMoreItems.value = histories.size >= pagingValue
             }, { error ->
                 toast(error.message)
             })
@@ -127,10 +128,11 @@ class HistoryViewModel(private var today: LocalDate): ViewModel() {
     }
 
     fun reloadHistory() {
-        pagingEndDate = today
         allHistoryInternal.clear()
         loadNextHistory()
     }
+
+    fun getHasMoreItems(): LiveData<Boolean> = hasMoreItems
 
     override fun onCleared() {
         historyLoadingWork?.dispose()

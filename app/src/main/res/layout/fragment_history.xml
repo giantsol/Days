@@ -13,6 +13,7 @@
         android:paddingTop="16dp"
         android:clipToPadding="false"
         android:visibility="gone"
+        android:scrollbars="vertical"
         />
 
     <FrameLayout

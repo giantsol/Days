@@ -22,8 +22,13 @@ import com.hansollee.mydays.widgets.HistoryGraphView
  */
 
 class HistoryListAdapter(context: Context,
-                        private val globalViewModel: GlobalViewModel,
-                        private val itemClickListener: ItemClickListener): RecyclerView.Adapter<HistoryListAdapter.ItemViewHolder>() {
+                         private val historyViewModel: HistoryViewModel,
+                         private val globalViewModel: GlobalViewModel,
+                         private val itemClickListener: ItemClickListener): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    companion object {
+        private const val VIEW_TYPE_FOOTER = -1
+    }
 
     interface ItemClickListener {
         fun onItemClick(history: History)
@@ -32,6 +37,7 @@ class HistoryListAdapter(context: Context,
     private val inflater = LayoutInflater.from(context)
     private val items: ArrayList<History> = ArrayList()
     @ColorInt private val defaultGraphColor = ContextCompat.getColor(context, R.color.default_history_graph_color)
+    private var showFooter: Boolean = true
 
     class DiffCallback(val oldList: List<History>, val newList: List<History>): DiffUtil.Callback() {
 
@@ -47,18 +53,30 @@ class HistoryListAdapter(context: Context,
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ItemViewHolder {
-        return ItemViewHolder.create(inflater, parent, viewType)
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_FOOTER) {
+            FooterViewHolder.create(inflater, parent)
+        } else {
+            ItemViewHolder.create(inflater, parent, viewType)
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return items[position].tasksGroupedByUnique.size
+        return if (position >= items.size) {
+            VIEW_TYPE_FOOTER
+        } else {
+            items[position].tasksGroupedByUnique.size
+        }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = if (showFooter) items.size + 1 else items.size
 
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.bind(items[position], itemClickListener, defaultGraphColor, globalViewModel)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is FooterViewHolder) {
+            historyViewModel.loadNextHistory()
+        } else {
+            (holder as ItemViewHolder).bind(items[position], itemClickListener, defaultGraphColor, globalViewModel)
+        }
     }
 
     fun updateItems(items: List<History>) {
@@ -69,7 +87,17 @@ class HistoryListAdapter(context: Context,
         this.items.addAll(items)
     }
 
-    class ItemViewHolder(view: View, private val categoryCount: Int) : RecyclerView.ViewHolder(view) {
+    fun setShowFooter(show: Boolean) {
+        if (showFooter && !show) {
+            notifyItemRemoved(items.size)
+        } else if (!showFooter && show) {
+            notifyItemInserted(items.size)
+        }
+
+        showFooter = show
+    }
+
+    class ItemViewHolder(view: View, categoryCount: Int) : RecyclerView.ViewHolder(view) {
 
         companion object {
             fun create(inflater: LayoutInflater, parent: ViewGroup?, categoryCount: Int)
@@ -108,5 +136,12 @@ class HistoryListAdapter(context: Context,
             }
         }
 
+    }
+
+    class FooterViewHolder(view: View): RecyclerView.ViewHolder(view) {
+        companion object {
+            fun create(inflater: LayoutInflater, parent: ViewGroup?)
+                = FooterViewHolder(inflater.inflate(R.layout.view_history_footer_item, parent, false))
+        }
     }
 }

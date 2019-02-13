@@ -32,7 +32,7 @@ class HistoryFragment : Fragment(), HistoryListAdapter.ItemClickListener {
         val historyViewModel = HistoryViewModel.getInstance(activity, globalViewModel.getTodayValue())
         tasksViewModel = TasksViewModel.getInstance(activity, globalViewModel.getTodayValue())
         val historyListView: RecyclerView = view.findViewById(R.id.history_list)
-        val historyListAdapter = HistoryListAdapter(context, globalViewModel, this)
+        val historyListAdapter = HistoryListAdapter(context, historyViewModel, globalViewModel, this)
         val emptyView: View = view.findViewById(R.id.empty_view)
 
         historyListView.layoutManager = LinearLayoutManager(context)
@@ -48,6 +48,10 @@ class HistoryFragment : Fragment(), HistoryListAdapter.ItemClickListener {
             }
 
             historyListAdapter.updateItems(items)
+        })
+
+        historyViewModel.getHasMoreItems().observe(this, Observer<Boolean> { hasMoreItems ->
+            historyListAdapter.setShowFooter(hasMoreItems)
         })
 
         globalViewModel.getToday().observe(this, Observer<LocalDate> { today ->
