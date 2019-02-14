@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.hansollee.mydays">
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -23,8 +21,12 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".FloatingWidgetService"
+        <service android:name=".MiniDaysService"
                  android:exported="false"
+            />
+        
+        <activity android:name=".SimpleTaskEditActivity"
+                  android:theme="@style/Theme.AppCompat.Light.Dialog.NoTitle"
             />
 
     </application>

@@ -1,11 +1,8 @@
 package com.hansollee.mydays
 
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.provider.Settings
 import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -65,12 +62,7 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         }
 
         miniMyDaysButton.setOnClickListener { _ ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                startActivityForResult(intent, 1000)
-            } else {
-                startFloatingWidgetService()
-            }
+            startMiniMyDaysService()
         }
 
         tasksViewModel.getLoadingStatus().observe(this, Observer<Boolean> { isLoading ->
@@ -82,20 +74,10 @@ class MainActivity : AppCompatActivity(), BackKeyDispatcher {
         })
     }
 
-    private fun startFloatingWidgetService() {
-        startService(Intent(this, FloatingWidgetService::class.java))
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 1000) {
-            if (resultCode == RESULT_OK) {
-                startFloatingWidgetService()
-            } else {
-                toast("Please!! Permission!!")
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
+    private fun startMiniMyDaysService() {
+        val intent = Intent(this, MiniDaysService::class.java)
+        intent.action = MiniDaysService.ACTION_START_SERVICE
+        ContextCompat.startForegroundService(this, intent)
     }
 
     override fun addBackKeyListener(listener: BackKeyListener) {

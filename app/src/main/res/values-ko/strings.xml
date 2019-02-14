@@ -40,4 +40,9 @@
 
     <string name="hours_text">시간</string>
     <string name="minutes_text">분</string>
+
+    <string name="start_text">시작</string>
+    <string name="stop_text">중지</string>
+
+    <string name="noti_empty_task_description">클릭해서 작업 설명을 추가해주세요!</string>
 </resources>
