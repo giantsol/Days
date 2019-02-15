@@ -9,8 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:gravity="center_vertical"
         >
 
@@ -26,8 +24,8 @@
 
         <ImageView
             android:id="@+id/thumbnail"
-            android:layout_width="@dimen/task_item_thumbnail_size"
-            android:layout_height="@dimen/task_item_thumbnail_size"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginLeft="@dimen/task_item_thumbnail_margin_left"
             android:layout_marginStart="@dimen/task_item_thumbnail_margin_left"
             android:src="@drawable/circle"
@@ -35,5 +33,34 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="end"
+        >
+
+        <TextView
+            android:id="@+id/elapsed_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/grey"
+            />
+
+        <TextView
+            android:id="@+id/start_or_stop_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:clickable="true"
+            android:textColor="@android:color/black"
+            android:text="@string/start_text"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            />
+
+    </LinearLayout>
 
 </LinearLayout>

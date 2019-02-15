@@ -73,7 +73,7 @@ class TasksViewModel(private var today: LocalDate): ViewModel() {
     fun insertNewTask(task: Task) {
         taskDao.insertTask(task).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
+            .subscribe { _ ->
                 loadTask(task)
             }
     }

@@ -10,13 +10,14 @@ import org.threeten.bp.format.DateTimeFormatterBuilder
 import org.threeten.bp.format.SignStyle
 import org.threeten.bp.format.TextStyle
 import org.threeten.bp.temporal.ChronoField
+import java.util.function.ToIntBiFunction
 
 /**
  * Created by kevin-ee on 2019-02-02.
  */
 
 val SECONDS_PER_DAY = 86400
-private val MINUTES_PER_HOUR = 60
+val MINUTES_PER_HOUR = 60
 
 private val todayText by lazy {
     appContext!!.resources.getString(R.string.today_text)
@@ -106,7 +107,14 @@ private val durationStringFormatter = DateTimeFormatterBuilder()
     .appendLiteral(minutesText)
     .toFormatter()
 
-fun LocalTime.toMinuteOfDay(): Int = if (this == MAX_LOCALTIME) 24 * MINUTES_PER_HOUR else hour * MINUTES_PER_HOUR + minute
+fun LocalTime.toMinuteOfDay(): Long = if (this == MAX_LOCALTIME) 24L * MINUTES_PER_HOUR else (hour * MINUTES_PER_HOUR + minute).toLong()
+
+object LocalTimeCompanion {
+    fun ofMinuteOfDay(minutes: Long): LocalTime = LocalTime.of((minutes / MINUTES_PER_HOUR).toInt(),
+        (minutes % MINUTES_PER_HOUR).toInt())
+}
+
+fun LocalTime.toDurationDisplayFormat(): String = this.format(durationStringFormatter)
 
 // LocalDateTime
 

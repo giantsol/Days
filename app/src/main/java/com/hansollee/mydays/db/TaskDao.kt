@@ -33,7 +33,7 @@ interface TaskDao {
     fun getTasksBetweenDates(from: LocalDate, to: LocalDate): Single<List<Task>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTask(task: Task): Completable
+    fun insertTask(task: Task): Single<Long>
 
     @Update
     fun updateTask(task: Task): Completable
